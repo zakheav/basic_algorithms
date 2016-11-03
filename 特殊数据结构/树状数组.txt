@@ -1,0 +1,57 @@
+// 使用树状数组的题：315. Count of Smaller Numbers After Self
+// 树状数组用于计算频繁更新的数组的给定区间的和
+public class TreeArray {
+	int[] c;// 存树状数组，下标从1开始
+	int[] n;// 把nums数组改成下标从1开始存放，其他不变
+
+	private int lowbit(int k) {// 假如k二进制低位为0的个数为m，则返回2^m
+		return k & (-k);// -k相当于对k取反然后加一
+	}
+
+	void update(int i, int val) {// 更新某个元素的值为val，传入的下标从0开始
+		++i;// 下标从1开始
+		int plus = val - n[i];// 相对于原来的值增加的值
+		n[i] = val;
+		while (i < c.length) {
+			c[i] += plus;
+			i = i + lowbit(i);
+		}
+	}
+	
+	void add(int i, int val) {// 把某个元素的值增加val，传入的下标从0开始
+		++i;// 下标从1开始
+		int plus = val;
+		n[i] = val;
+		while (i < c.length) {
+			c[i] += plus;
+			i = i + lowbit(i);
+		}
+	}
+
+	public int sumRange(int i, int j) {// 计算给定区间的和，传入的下标从0开始
+		int low = 0;// nums中[0,i]的sum
+		int high = 0;// nums中[0,j]的sum
+
+		i = i + 1 - 1;
+		++j;// c中的下标是从1开始的
+		while (i > 0) {
+			low = low + c[i];
+			i = i - lowbit(i);
+		}
+
+		while (j > 0) {
+			high = high + c[j];
+			j = j - lowbit(j);
+		}
+
+		return high - low;
+	}
+
+	public TreeArray(int[] nums) {// 建立树状数组
+		n = new int[nums.length + 1];
+		c = new int[nums.length + 1];
+		for (int i = 0; i < nums.length; ++i) {
+			update(i, nums[i]);// 调用更新函数，把全是0的c逐步变成应该有的样子
+		}
+	}
+}

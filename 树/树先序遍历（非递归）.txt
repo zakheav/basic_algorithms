@@ -1,0 +1,26 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class PreOrderTraversal{
+	public void traversal(TreeNode root){
+		TreeNode now = root;
+		Stack<TreeNode> stack = new Stack<TreeNode>();// 这里先序和中序是一样的
+		while(now != null || !stack.isEmpty()) {
+			if(now != null) {
+				System.out.println(now.val);// 访问该节点
+				if(now.right != null){
+					stack.push(now.right);
+				}
+				now = now.left;
+			} else {
+				now = stack.pop();
+			}
+		}
+	}
+}

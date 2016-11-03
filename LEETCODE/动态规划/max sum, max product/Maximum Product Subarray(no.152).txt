@@ -1,0 +1,22 @@
+public class Solution {
+	public int maxProduct(int[] nums) {
+		int localMax = nums[0];
+		int localMin = nums[0];
+		int globalMax = nums[0];
+		for (int i = 1; i < nums.length; ++i) {
+			if (nums[i] > 0) {
+				int newLocalMax = Math.max(nums[i] * localMax, nums[i]);// 这里如果用localMax存储结果，是产生bug的陷阱
+				int newLocalMin = Math.min(nums[i] * localMin, nums[i]);
+				localMax = newLocalMax;
+				localMin = newLocalMin;
+			} else {
+				int newLocalMax = Math.max(nums[i] * localMin, nums[i]);// 这里如果用localMax存储结果，是产生bug的陷阱
+				int newLocalMin = Math.min(nums[i] * localMax, nums[i]);
+				localMax = newLocalMax;
+				localMin = newLocalMin;
+			}
+			globalMax = Math.max(localMax, globalMax);
+		}
+		return globalMax;
+	}
+}

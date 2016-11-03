@@ -1,0 +1,38 @@
+public class UnionFindSet {
+	private int[] parent;// 记录每个节点父节点下标
+	private int[] rank;// 记录每个节点为根的子树高度
+
+	public UnionFindSet(int num) {
+		parent = new int[num];
+		rank = new int[num];
+		for (int i = 0; i < num; ++i) {// 初始化并查集
+			parent[i] = i;
+			rank[i] = 1;
+		}
+	}
+
+	public int find(int x) {// 找到x所在集合
+		if (parent[x] == x) {
+			return x;
+		} else {
+			return find(parent[x]);
+		}
+	}
+
+	public void union(int x, int y) {// 把x，y两个元素所在集合合并
+		int xSet = find(x);
+		int ySet = find(y);
+		if (xSet == ySet) {
+			return;
+		} else {
+			if (rank[xSet] > rank[ySet]) {// x所在集合的树比较高，把y集合并到x集合中
+				parent[ySet] = xSet;
+			} else {// 把x的集合并到y的集合中
+				if (rank[xSet] == rank[ySet]) {// 两棵树高度相同
+					++rank[ySet];
+				}
+				parent[xSet] = ySet;
+			}
+		}
+	}
+}

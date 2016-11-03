@@ -1,0 +1,33 @@
+class ListNode {
+	int val;
+	ListNode next;
+	ListNode(int x) {
+		val = x;
+	}
+}
+
+public class Delete {
+	public ListNode deleteByVal(int x, ListNode head) {// 删除指定值的所有节点
+		ListNode pre = null, now = head;
+		while (now != null) {
+			if (now.val == x) {// 找到待删除节点
+				if (pre == null) // 删除头部
+					head = head.next;
+				else 
+					pre.next = now.next;
+				now = now.next;
+			} else {
+				pre = now;
+				now = now.next;
+			}
+		}
+		return head;
+	}
+
+	public void deleteByNode(ListNode head, ListNode node) {// 删除指定的节点（不包括尾节点）
+		// 这种删除方法不会改变头节点的指针，所以不需要返回值
+		if(node == null) return;
+		node.val = node.next.val;// 把后面节点元素的值复制到当前节点
+		node.next = node.next.next;// 删除后面节点
+	}
+}

@@ -1,0 +1,26 @@
+public class Graph {
+	public ArrayList<HashSet<Integer>> adjTable = new ArrayList<HashSet<Integer>>();// 构造的是出度邻接表
+
+	public Graph(int pointNum, int[][] pairs) {// 输入点对，边的方向是从pairs[][0]到pairs[][1]
+		for (int i = 0; i < pointNum; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		} // 初始化邻接表
+		for (int i = 0; i < pairs.length; ++i) {
+			adjTable.get(pairs[i][0]).add(pairs[i][1]);
+		}
+	}
+
+	public ArrayList<HashSet<Integer>> transposeGraph() {
+		ArrayList<HashSet<Integer>> tAdjTable = new ArrayList<HashSet<Integer>>();
+		for (int i = 0; i < adjTable.size(); ++i) {
+			tAdjTable.add(new HashSet<Integer>());
+		} // 初始化转置后的邻接表
+
+		for (int i = 0; i < adjTable.size(); ++i) {
+			for (int j : adjTable.get(i)) {
+				tAdjTable.get(j).add(i);
+			}
+		}
+		return tAdjTable;
+	}
+}

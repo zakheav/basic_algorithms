@@ -1,0 +1,70 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	public ListNode addTwoNumbers(ListNode l1, ListNode l2) {
+		ListNode ptr1 = l1;
+		ListNode ptr2 = l2;
+		ListNode result = null;
+		ListNode ptr3 = null;
+		int c = 0;// 进位
+		while (ptr1 != null && ptr2 != null) {
+			int a = ptr1.val;
+			int b = ptr2.val;
+			int r = (a + b + c) % 10;
+			c = (a + b + c) / 10;
+			if (result == null) {
+				ptr3 = new ListNode(r);
+				result = ptr3;
+			} else {
+				ListNode newNode = new ListNode(r);
+				ptr3.next = newNode;
+				ptr3 = newNode;
+			}
+			ptr1 = ptr1.next;
+			ptr2 = ptr2.next;
+		}
+		if (ptr1 != null) {
+			while (ptr1 != null) {
+				int a = ptr1.val;
+				int r = (a + c) % 10;
+				c = (a + c) / 10;
+				if (result == null) {
+					ptr3 = new ListNode(r);
+					result = ptr3;
+				} else {
+					ListNode newNode = new ListNode(r);
+					ptr3.next = newNode;
+					ptr3 = newNode;
+				}
+				ptr1 = ptr1.next;
+			}
+		} else {
+			while (ptr2 != null) {
+				int a = ptr2.val;
+				int r = (a + c) % 10;
+				c = (a + c) / 10;
+				if (result == null) {
+					ptr3 = new ListNode(r);
+					result = ptr3;
+				} else {
+					ListNode newNode = new ListNode(r);
+					ptr3.next = newNode;
+					ptr3 = newNode;
+				}
+				ptr2 = ptr2.next;
+			}
+		}
+		if (c != 0) {
+			ListNode newNode = new ListNode(c);
+			ptr3.next = newNode;
+			ptr3 = newNode;
+		}
+		return result;
+	}
+}

@@ -1,0 +1,30 @@
+public class Solution {
+	public int largestRectangleArea(int[] heights) {
+		Stack<Integer> risenStack = new Stack<Integer>();// 单调递增的栈
+		Stack<Integer> absorbCounterStack = new Stack<Integer>();// 记录每个栈元素包含了周围多少长方形（吸收周围比自己高的）
+		int maxArea = 0;
+		for (int i = 0; i <= heights.length; ++i) {
+			int height = i == heights.length ? 0 : heights[i];// 相当于在heights数组末尾加了一个0高度的矩形，保证最后所有矩形出栈
+			if (risenStack.isEmpty() || height >= risenStack.peek()) {// 当前矩形入栈(关键：用height>=risenStack.peek())
+				risenStack.push(height);
+				absorbCounterStack.push(1);
+			} else {
+				// 把不比当前矩形矮的矩形依次出栈
+				int counter = 0;// 当前矩形的absorbCounter初始值
+				while (!risenStack.isEmpty() && height < risenStack.peek()) {// (关键：用height<risenStack.peek())
+					int absorbCounter = absorbCounterStack.pop();
+					int h = risenStack.pop();// 矩阵出栈
+
+					counter += absorbCounter;
+					int tempArea = counter * h;// 以出栈的矩形为高的聚合矩形的面积
+					maxArea = Math.max(maxArea, tempArea);// （只在出栈的时候计算聚合面积）
+				}
+
+				// 当前矩阵入栈
+				risenStack.push(height);
+				absorbCounterStack.push(counter + 1);
+			}
+		}
+		return maxArea;
+	}
+}

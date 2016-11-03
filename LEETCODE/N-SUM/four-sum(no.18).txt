@@ -1,0 +1,50 @@
+﻿public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	public List<List<Integer>> fourSum(int[] nums, int target) {
+		if (nums.length < 4)
+			return results;
+		Arrays.sort(nums);
+		for (int i = 0; i < nums.length - 3; ++i) {
+			int a = nums[i];
+			threeSum(nums, i + 1, a, target);// 调用twoSum
+			while (i + 1 < nums.length - 3 && nums[i + 1] == nums[i]) {// 需要把相同的数据跳过
+				++i;
+			}
+		}
+		return results;
+	}
+
+	public void threeSum(int[] nums, int left, int choice1, int target) {
+		for (int i = left; i < nums.length - 2; ++i) {
+			int a = nums[i];
+			twoSum(nums, i + 1, nums.length - 1, choice1, a, target);// 调用twoSum
+			while (i + 1 < nums.length - 2 && nums[i + 1] == nums[i]) {// 需要把相同的数据跳过
+				++i;
+			}
+		}
+	}
+
+	public void twoSum(int[] nums, int left, int right, int choice1, int choice2, int target) {
+		target = target - choice1 - choice2;
+		while (left < right) {
+			if (nums[left] + nums[right] == target) {
+				List<Integer> result = new ArrayList<Integer>();
+				result.add(choice1);
+				result.add(choice2);
+				result.add(nums[left]);
+				result.add(nums[right]);
+				results.add(result);
+				// 这种情况要把相同数据需要跳过
+				while (left < right && nums[left] == nums[left + 1]) ++left;
+				while (left < right && nums[right] == nums[right - 1]) --right;
+				++left;
+				--right;
+			} else if (nums[left] + nums[right] < target) {
+				++left;
+			} else {
+				--right;
+			}
+		}
+	}
+}

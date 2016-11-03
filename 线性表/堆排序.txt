@@ -1,0 +1,47 @@
+// 一个堆的大小为n，下标从0开始
+// 最后一个有孩子的节点下标为n/2-1
+// 下标为i的元素左孩子是(i+1)*2-1，右孩子是(i+1)*2
+
+public class HeapSort{// 小根堆
+	private void adjustHeap(int[] nums, int idx, int size) {// 调整idx为根的子树为小根堆
+		int now = idx;
+		int LNWC = size / 2 - 1;// last node with children(最后一个有孩子的节点)
+		while (now <= LNWC) {
+			int left = (now + 1) * 2 - 1;
+			int right = (now + 1) * 2;
+			if (nums[now] > nums[left] || (right < size && nums[now] > nums[right])) {
+				// 确保把小的孩子换到根部
+				if (right >= size || nums[left] < nums[right]) {
+					int temp = nums[now];
+					nums[now] = nums[left];
+					nums[left] = temp;
+					now = left;
+				} else {
+					int temp = nums[now];
+					nums[now] = nums[right];
+					nums[right] = temp;
+					now = right;
+				}
+			} else {
+				break;
+			}
+		}
+	}
+
+	public void sort(int[] nums) {
+		int LNWC = nums.length / 2 - 1;// last node with children(最后一个有孩子的节点)
+		// 建堆
+		for (int i = LNWC; i >= 0; --i) {
+			adjustHeap(nums, i, nums.length);
+		}
+		int size = nums.length;
+		for (int i = 0; i < nums.length; ++i) {
+			System.out.println(nums[0]);// 每次取堆顶的数字输出
+			// 然后把堆顶的数字和堆的最后一个交换，并减小堆的大小
+			nums[0] = nums[size - 1];
+			--size;
+			// 调整堆
+			adjustHeap(nums, 0, size);
+		}
+	}
+}

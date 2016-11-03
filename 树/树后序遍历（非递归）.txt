@@ -1,0 +1,42 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+
+public class PostOrderTraversal{
+	public void traversal(TreeNode root){
+		if(root == null) return;
+		TreeNode now = root;
+		Stack<TreeNode> stack = new Stack<TreeNode>();
+		Stack<Integer> mark = new Stack<Integer>();// 用于记录每个栈中节点访问次数
+		
+		stack.push(now);
+		mark.push(0);// 和先序，中序不同，在进入循环前先要入栈
+		while(!stack.isEmpty()) {
+			int flag = mark.peek();
+			now = stack.peek();
+			if(flag == 0){// 该节点第一次入栈（左右子树都还没有访问）
+				mark.pop(); mark.push(1);// 修改mark
+				if(now.left != null){
+					stack.push(now.left);
+					mark.push(0);
+				}
+			} else if(flag == 1){// 该节点的左子树已经访问完了
+				mark.pop(); mark.push(2);// 修改mark
+				if(now.right != null){
+					stack.push(now.right);
+					mark.push(0);
+				}
+			} else if(flag == 2){// 该节点的右子树已经访问完了，可以访问该节点了
+				System.out.println(now.val);
+				stack.pop();
+				mark.pop();
+			}
+		}
+	}
+}

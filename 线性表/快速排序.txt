@@ -1,0 +1,33 @@
+public class QuickSort{
+	public void sort(int[] nums, int low, int high) {
+		int pivot = nums[low];// 枢轴
+		int lowIdx = low;
+		int highIdx = high;
+		int status = 0;// 默认移动highIdx, status = 1是移动lowIdx;
+		while (lowIdx < highIdx) {
+			if (status == 0) {// 移动highIdx
+				if (nums[highIdx] >= pivot) {
+					--highIdx;
+				} else {
+					nums[lowIdx] = nums[highIdx];
+					status = 1;
+				}
+			} else if (status == 1) {// 移动lowIdx
+				if (nums[lowIdx] <= pivot) {
+					++lowIdx;
+				} else {
+					nums[highIdx] = nums[lowIdx];
+					status = 0;
+				}
+				
+			}
+		}
+		nums[lowIdx] = pivot;
+		if (lowIdx - 1 > low) {
+			sort(nums, low, lowIdx - 1);
+		}
+		if (lowIdx + 1 < high) {
+			sort(nums, lowIdx + 1, high);
+		}
+	}
+}

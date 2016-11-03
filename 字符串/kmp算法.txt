@@ -1,0 +1,41 @@
+#include<stdio.h>
+#include<stdlib.h>
+//模式串长度最长不要超过127 
+void buildString(char* String, char* str){//把一个标准的c字符串构造成为标准字符串（就是String[0]位置存储字符串长度，没有字符串结尾的'\0'） 
+	int i=0;
+	for( i=0; str[i]!='\0'; ++i ){
+		String[i+1] = str[i];
+	}
+	String[0] = i;
+}
+void get_next(int next[], char* pattern ){
+	int j, k;
+	next[0] = pattern[0];//记录next数组的长度 pattern[0]是模式串的长度 
+	next[1] = 0; 
+	j=1; k=0; 
+	while( j<pattern[0] ){//注意是小于，不是小于等于 
+		//next[2]一定是等于1的
+		if( k==0 || pattern[j] == pattern[k] ){//模式串自己和自己匹配成功或者彻底失败（彻底失败next[++j]填的值是1） 
+			++k;++j;//每次检查j与k位置的值，但是修改的是j+1的值
+			next[j] = k; 
+		} else{
+			k = next[k]; 
+		} 
+	} 
+}
+int kmp(char* mother, char* pattern){//mother，pattern都是标准的字符串，0下标位置存储字符串长度，字符串结尾没有'\0' 
+	int next[200];
+	get_next(next,pattern);//产生模式串的next数组 
+	int i=1, j=1;
+	while( mother[i] <= mother[0] && j <= pattern[0] ){
+		if( j==0 || mother[i] == pattern[j] ){//模式串和母串匹配成功或者彻底失败 
+			++j; ++i;
+		} else{
+			j = next[j];//i不动，模式串移动
+		}
+	}
+	if( j>pattern[0] ) return i-pattern[0];//匹配完成，返回第一次匹配成功的位置
+	else return 0;//没有匹配到 
+}
+
+//调用kmp之前需要调用buildString把字符串标准化

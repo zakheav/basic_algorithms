@@ -1,0 +1,25 @@
+public class Solution {
+	public int lengthOfLongestSubstring(String s) {
+		int[] visitTimes = new int[200];
+		int ptr1 = 0;
+		int ptr2 = 1;
+		int max = 0;
+		if (s.length() == 0)
+			return max;
+		visitTimes[s.charAt(0)] = 1;
+		while (ptr2 < s.length()) {
+			if (visitTimes[s.charAt(ptr2)] == 1) {// 出现了重复的字母
+				max = max > ptr2 - ptr1 ? max : ptr2 - ptr1;// 记录max
+				char dupLetter = s.charAt(ptr2);// 重复的字母
+				do {
+					--visitTimes[s.charAt(ptr1)];
+					++ptr1;
+				} while (visitTimes[dupLetter] == 1);// 移动ptr1到重复字母第一次出现之后
+			}
+			visitTimes[s.charAt(ptr2)] = 1;
+			++ptr2;
+		}
+		max = max > ptr2 - ptr1 ? max : ptr2 - ptr1;// 补漏
+		return max;
+	}
+}

@@ -1,0 +1,71 @@
+public class Graph {
+	public ArrayList<HashSet<Integer>> adjTable = new ArrayList<HashSet<Integer>>();// 构造的是出度邻接表
+
+	public Graph(int pointNum, int[][] pairs) {// 输入点对，边的方向是从pairs[][0]到pairs[][1]
+		for (int i = 0; i < pointNum; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		} // 初始化邻接表
+		for (int i = 0; i < pairs.length; ++i) {
+			adjTable.get(pairs[i][0]).add(pairs[i][1]);
+		}
+	}
+
+	class Flag {
+		public int color;// 颜色：0是白色，1是灰色，2是黑色
+		public int sTime;// 开始时刻，记录每个节点暴露在栈顶的时刻
+		public int eTime;// 结束时刻，记录每个节点出栈的时刻
+
+		public Flag(int c, int s, int e) {
+			color = c;
+			sTime = s;
+			eTime = e;
+		}
+	}// 为深度优先搜索过程记录必要信息
+
+	public ArrayList<Flag> DFS() {
+		int time = 0;// 全局时间戳
+		Stack<Integer> stack = new Stack<Integer>();// 深度优先用栈
+		ArrayList<Flag> flags = new ArrayList<Flag>();
+		Boolean finishTraversal = false;
+		// 白色表示该节点没有访问过；灰色表示访问了，但是它的孩子没访问完；黑色是这个节点和它的孩子节点都访问完了
+		for (int i = 0; i < adjTable.size(); ++i) {
+			flags.add(new Flag(0, -1, -1));
+		}
+
+		while (!finishTraversal) {
+			int begin = -1;
+			for (int i = 0; i < flags.size(); ++i) {
+				if (flags.get(i).color == 0) {
+					begin = i;
+					break;
+				}
+			} // 寻找一个没有遍历过的点
+			if (begin != -1) {
+				stack.push(begin);
+				flags.get(begin).color = 1;
+				while (!stack.isEmpty()) {
+					int now = stack.peek();
+					if (flags.get(now).sTime == -1) {// 第一次暴露在栈顶
+						flags.get(now).sTime = ++time;
+					}
+					boolean findWhite = false;// 记录是否找到了白色的孩子节点
+					for (int child : adjTable.get(now)) {
+						if (flags.get(child).color == 0) {
+							findWhite = true;
+							stack.push(child);
+							flags.get(child).color = 1;
+						}
+					}
+					if (!findWhite) {// now节点的孩子全部访问完了
+						stack.pop();
+						flags.get(now).color = 2;
+						flags.get(now).eTime = ++time;
+					}
+				}
+			} else {
+				finishTraversal = true;
+			}
+		}
+		return flags;
+	}
+}

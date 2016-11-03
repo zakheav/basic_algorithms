@@ -1,0 +1,28 @@
+class ListNode {
+	int val;
+	ListNode next;
+	ListNode(int x) {
+		val = x;
+	}
+}
+
+public class Reverse {
+	public ListNode reverse(ListNode head) {
+		ListNode pre, now, next;
+		pre = null;
+		now = head;
+		if(now == null) {
+			return head;
+		}
+		next = now.next;
+		while(now != null) {
+			now.next = pre;
+			pre = now;
+			now = next;
+			if(next != null) {
+				next = next.next;
+			}
+		}
+		return pre;
+	}
+}

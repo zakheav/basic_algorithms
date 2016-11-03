@@ -1,0 +1,33 @@
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	public void DFS(int[] candidates, int idx, int sum, List<Integer> path, int target) {
+		for (int i = idx; i < candidates.length; ++i) {
+			sum += candidates[i];
+			path.add(candidates[i]);
+			if (sum == target) {
+				List<Integer> result = new ArrayList<Integer>();
+				for (Integer num : path) {
+					result.add(num);
+				}
+				results.add(result);
+			} else if (sum < target) {
+				DFS(candidates, i + 1, sum, path, target);
+			}
+			// 为新的循环做准备
+			path.remove(path.size() - 1);
+			sum -= candidates[i];
+			// 跳过所有重复的数字
+			while (i + 1 < candidates.length && candidates[i + 1] == candidates[i])
+				++i;
+		}
+
+	}
+
+	public List<List<Integer>> combinationSum2(int[] candidates, int target) {
+		List<Integer> path = new ArrayList<Integer>();
+		Arrays.sort(candidates);
+		DFS(candidates, 0, 0, path, target);
+		return results;
+	}
+}

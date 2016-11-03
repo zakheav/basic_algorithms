@@ -1,0 +1,163 @@
+public class Graph {
+	public ArrayList<HashSet<Integer>> adjTable = new ArrayList<HashSet<Integer>>();// 构造的是出度邻接表
+
+	public Graph(int pointNum, int[][] pairs) {// 输入点对，边的方向是从pairs[][0]到pairs[][1]
+		for (int i = 0; i < pointNum; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		} // 初始化邻接表
+		for (int i = 0; i < pairs.length; ++i) {
+			adjTable.get(pairs[i][0]).add(pairs[i][1]);
+		}
+	}
+
+	class Flag {
+		public int color;// 颜色：0是白色，1是灰色，2是黑色
+		public int sTime;// 开始时刻，记录每个节点暴露在栈顶的时刻
+		public int eTime;// 结束时刻，记录每个节点出栈的时刻
+
+		public Flag(int c, int s, int e) {
+			color = c;
+			sTime = s;
+			eTime = e;
+		}
+	}// 为深度优先搜索过程记录必要信息
+
+	public ArrayList<Flag> DFS() {
+		int time = 0;// 全局时间戳
+		Stack<Integer> stack = new Stack<Integer>();// 深度优先用栈
+		ArrayList<Flag> flags = new ArrayList<Flag>();
+		Boolean finishTraversal = false;
+		// 白色表示该节点没有访问过；灰色表示访问了，但是它的孩子没访问完；黑色是这个节点和它的孩子节点都访问完了
+		for (int i = 0; i < adjTable.size(); ++i) {
+			flags.add(new Flag(0, -1, -1));
+		}
+
+		while (!finishTraversal) {
+			int begin = -1;
+			for (int i = 0; i < flags.size(); ++i) {
+				if (flags.get(i).color == 0) {
+					begin = i;
+					break;
+				}
+			} // 寻找一个没有遍历过的点
+			if (begin != -1) {
+				stack.push(begin);
+				flags.get(begin).color = 1;
+				while (!stack.isEmpty()) {
+					int now = stack.peek();
+					if (flags.get(now).sTime == -1) {// 第一次暴露在栈顶
+						flags.get(now).sTime = ++time;
+					}
+					boolean findWhite = false;// 记录是否找到了白色的孩子节点
+					for (int child : adjTable.get(now)) {
+						if (flags.get(child).color == 0) {
+							findWhite = true;
+							stack.push(child);
+							flags.get(child).color = 1;
+						}
+					}
+					if (!findWhite) {// now节点的孩子全部访问完了
+						stack.pop();
+						flags.get(now).color = 2;
+						flags.get(now).eTime = ++time;
+					}
+				}
+			} else {
+				finishTraversal = true;
+			}
+		}
+		return flags;
+	}
+
+	public ArrayList<HashSet<Integer>> transposeGraph() {
+		ArrayList<HashSet<Integer>> tAdjTable = new ArrayList<HashSet<Integer>>();
+		for (int i = 0; i < adjTable.size(); ++i) {
+			tAdjTable.add(new HashSet<Integer>());
+		} // 初始化转置后的邻接表
+
+		for (int i = 0; i < adjTable.size(); ++i) {
+			for (int j : adjTable.get(i)) {
+				tAdjTable.get(j).add(i);
+			}
+		}
+		return tAdjTable;
+	}
+
+	class MaxHeapElement {
+		public int idx;
+		public int eTime;
+		public MaxHeapElement(int i, int e) {
+			idx = i;
+			eTime = e;
+		}  
+	}// 最大堆中的元素
+
+	class Cmp implements Comparator<MaxHeapElement> {
+		public int compare(MaxHeapElement x, MaxHeapElement y) {
+			return y.eTime - x.eTime;
+		}
+	};// 为了实现大根堆，自定义的比较对象
+
+	public ArrayList<ArrayList<Integer>> strongConnectedComponents() {
+		ArrayList<ArrayList<Integer>> sccSet = new ArrayList<ArrayList<Integer>>();// 强连通分量的集合
+		ArrayList<HashSet<Integer>> tAdjTable = transposeGraph();// 获得逆邻接表
+		PriorityQueue<MaxHeapElement> maxHeap = new PriorityQueue<MaxHeapElement>(11, new Cmp());// 11是默认的初始大小
+		// 在原来的图上进行dfs
+		ArrayList<Flag> flags = DFS();
+
+		// 在逆邻接表上进行dfs
+		Stack<Integer> stack = new Stack<Integer>();// 深度优先用栈
+		ArrayList<Integer> color = new ArrayList<Integer>();
+		for (int i = 0; i < tAdjTable.size(); ++i) {
+			color.add(0);
+		}
+
+		for (int i = 0; i < color.size(); ++i) {
+			maxHeap.offer(new MaxHeapElement(i, flags.get(i).eTime));
+		} // 生成大根堆
+
+		while (!maxHeap.isEmpty()) {
+			int begin = maxHeap.poll().idx;// 选出结束时间最晚的一个节点
+			// 从begin开始在逆邻接表上进行DFS
+			stack.push(begin);
+			color.set(begin, 1);
+			ArrayList<Integer> scc = new ArrayList<Integer>();// 一个强连通分量
+			while (!stack.isEmpty()) {
+				int now = stack.peek();
+				boolean findWhite = false;// 记录是否找到了白色的孩子节点
+				for (int child : tAdjTable.get(now)) {
+					if (color.get(child) == 0) {
+						findWhite = true;
+						stack.push(child);
+						color.set(child, 1);
+					}
+				}
+				if (!findWhite) {// now节点的孩子全部访问完了
+					scc.add(now);// 加入强连通分量中
+					stack.pop();
+					color.set(now, 2);
+				}
+			}
+			sccSet.add(scc);
+			maxHeap = new PriorityQueue<MaxHeapElement>(11, new Cmp());// 11是默认的初始大小
+			for (int i = 0; i < color.size(); ++i) {
+				if (color.get(i) == 0) {
+					maxHeap.offer(new MaxHeapElement(i, flags.get(i).eTime));
+				}
+			}
+		}
+		return sccSet;
+	}
+
+	public static void main(String[] args) {
+		int[][] nums = { { 0, 1 }, { 0, 3 }, { 1, 2 }, { 3, 2 }, { 3, 4 }, { 5, 4 }, { 4, 0 } };
+
+		ArrayList<ArrayList<Integer>> sccSet = new Graph(6, nums).strongConnectedComponents();
+		for (int i = 0; i < sccSet.size(); ++i) {
+			for (int j = 0; j < sccSet.get(i).size(); ++j) {
+				System.out.print(" " + sccSet.get(i).get(j));
+			}
+			System.out.println();
+		}
+	}
+}

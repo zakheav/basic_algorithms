@@ -1,0 +1,38 @@
+public class Graph {
+	public ArrayList<HashSet<Integer>> adjTable = new ArrayList<HashSet<Integer>>();// 构造的是出度邻接表
+
+	public Graph(int pointNum, int[][] pairs) {// 输入点对，边的方向是从pairs[][0]到pairs[][1]
+		for (int i = 0; i < pointNum; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		} // 初始化邻接表
+		for (int i = 0; i < pairs.length; ++i) {
+			adjTable.get(pairs[i][0]).add(pairs[i][1]);
+		}
+	}
+
+	public void topologicalSort() {
+		int[] indegree = new int[adjTable.size()];// 记录每个节点的入度
+		for (int i = 0; i < adjTable.size(); ++i) {
+			for (int child : adjTable.get(i)) {
+				++indegree[child];
+			}
+		}
+
+		Queue<Integer> queue = new LinkedList<Integer>();// 用于拓扑排序的队列
+		for (int i = 0; i < indegree.length; ++i) {
+			if (indegree[i] == 0) {
+				queue.offer(i);
+			}
+		}
+		while (!queue.isEmpty()) {
+			int now = queue.poll();
+			System.out.println(now);// 输出排序结果
+			for (int child : adjTable.get(now)) {
+				--indegree[child];// now节点已经输出完毕，所以now节点的子节点入度全部减一
+				if (indegree[child] == 0) {
+					queue.offer(child);
+				}
+			}
+		}
+	}
+}
