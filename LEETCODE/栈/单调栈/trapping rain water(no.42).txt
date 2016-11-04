@@ -1,0 +1,31 @@
+public class Solution {
+	public int trap(int[] heights) {
+		Stack<Integer> descStack = new Stack<Integer>();// 单调递减的栈
+		Stack<Integer> absorbCounterStack = new Stack<Integer>();// 每个障碍其左边比自己矮的障碍数目+1
+
+		int totalWater = 0;
+		int maxHeight = 0;// 当前栈内最高的障碍高度（栈底元素的值）
+		for (int i = 0; i < heights.length; ++i) {
+			int height = heights[i];
+			if (descStack.isEmpty() || height <= descStack.peek()) {// 当前障碍入栈
+				descStack.push(height);
+				absorbCounterStack.push(1);
+			} else {
+				int counter = 0;// 初始化左边比当前障碍矮的障碍物数目
+				while (!descStack.isEmpty() && height > descStack.peek()) {
+					int absorbCounter = absorbCounterStack.pop();
+					int h = descStack.pop();// 比当前障碍矮的障碍出栈
+
+					counter += absorbCounter;
+					totalWater += absorbCounter * (Math.min(maxHeight, height) - h);
+				}
+				// 当前障碍物入栈
+				descStack.push(height);
+				absorbCounterStack.push(counter + 1);
+			}
+			// 更新maxHeight
+			maxHeight = Math.max(maxHeight, height);
+		}
+		return totalWater;
+	}
+}
