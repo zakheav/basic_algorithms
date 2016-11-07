@@ -1,0 +1,29 @@
+public class Solution {
+	public int maxCoins(int[] nums) {
+		if (nums.length == 0)
+			return 0;
+		int[][] dp = new int[nums.length][nums.length];
+		for (int step = 1; step <= nums.length; ++step) {
+			for (int i = 0; i + step - 1 < nums.length; ++i) {
+				int beginIdx = i;// 段的起始
+				int endIdx = i + step - 1;// 段的结尾
+				for (int lastBurstIdx = beginIdx; lastBurstIdx <= endIdx; ++lastBurstIdx) {// 选择一段中最后点爆的气球下标，使得获利最大的
+					int leftBeginIdx = beginIdx;
+					int leftEndIdx = lastBurstIdx - 1;
+					int rightBeginIdx = lastBurstIdx + 1;
+					int rightEndIdx = endIdx;
+
+					int leftValue = leftBeginIdx <= leftEndIdx ? dp[leftBeginIdx][leftEndIdx] : 0;
+					int rightValue = rightBeginIdx <= rightEndIdx ? dp[rightBeginIdx][rightEndIdx] : 0;
+
+					int finalLeft = beginIdx - 1 >= 0 ? nums[beginIdx - 1] : 1;// lastBurstIdx气球点爆前其左边的气球价值
+					int finalRight = endIdx + 1 < nums.length ? nums[endIdx + 1] : 1;// lastBurstIdx气球点爆前其右边的气球价值
+					int finalValue = finalLeft * nums[lastBurstIdx] * finalRight;// lastBurstIdx气球点爆之后获得的价值
+
+					dp[beginIdx][endIdx] = Math.max(dp[beginIdx][endIdx], leftValue + finalValue + rightValue);
+				}
+			}
+		}
+		return dp[0][nums.length - 1];
+	}
+}
