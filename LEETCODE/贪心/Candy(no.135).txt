@@ -1,0 +1,27 @@
+public class Solution {
+	public int candy(int[] ratings) {
+		int[] candy = new int[ratings.length];
+		int candyNum = 0;
+		// 先每人分配一块
+		for (int i = 0; i < ratings.length; ++i) {
+			candy[i] = 1;
+		}
+		// 从左到右分配
+		for (int i = 1; i < ratings.length; ++i) {
+			if (ratings[i] > ratings[i - 1]) {
+				candy[i] = candy[i - 1] + 1;
+			}
+		}
+		// 从右到左分配
+		for (int i = ratings.length - 2; i >= 0; --i) {
+			if (ratings[i] > ratings[i + 1] && candy[i] <= candy[i + 1]) {
+				candy[i] = candy[i + 1] + 1;
+			}
+		}
+		// 统计
+		for (int i = 0; i < ratings.length; ++i) {
+			candyNum += candy[i];
+		}
+		return candyNum;
+	}
+}
