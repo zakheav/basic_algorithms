@@ -1,0 +1,33 @@
+// 思路：
+// 从0下标开始行车，如果到了i下标，油箱内剩余的油为负数
+// 说明，0下标到i下标前的每一个加油站都不可能成为起始点
+// 因为从之前的尝试可以得知，每一个站点出发时候油箱的剩余量>=0,这样都不能到达i下标
+// 如果从某个站点出发，即让油箱剩余量为0，这样就更不可能到达i下标了。
+public class Solution {
+	public int canCompleteCircuit(int[] gas, int[] cost) {
+		for (int startPos = 0; startPos < gas.length;) {// 从0开始寻找起始位置
+			int gasRemain = 0;
+			int gasCost = 0;
+			boolean canCompleteCircuit = true;
+			int step = 0;
+			while (step <= gas.length && canCompleteCircuit) {
+				gasRemain = gasRemain - gasCost;
+				if (gasRemain >= 0) {
+					int idx = (startPos + step) % gas.length;
+					gasRemain += gas[idx];
+					gasCost = cost[idx];// 记录下到下一站需要的油量
+				} else {
+					canCompleteCircuit = false;
+					break;
+				}
+				++step;
+			}
+			if (canCompleteCircuit) {
+				return startPos;
+			} else {
+				startPos += step;
+			}
+		}
+		return -1;
+	}
+}
