@@ -21,7 +21,7 @@ public class TreeArray {
 	void add(int i, int val) {// 把某个元素的值增加val，传入的下标从0开始
 		++i;// 下标从1开始
 		int plus = val;
-		n[i] = val;
+		n[i] += plus;
 		while (i < c.length) {
 			c[i] += plus;
 			i = i + lowbit(i);
