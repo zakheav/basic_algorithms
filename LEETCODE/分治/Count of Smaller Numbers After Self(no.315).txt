@@ -1,0 +1,73 @@
+public class Solution {
+	// 树状数组
+	class TreeArray {// 适用于经常修改元素的数组的某一段的sum
+		int[] n;// n数组，存储原始nums数组中的元素，下标从1开始
+		int[] c;// c数组，下标从1开始
+
+		private int lowbit(int k) {// 已知k，假如k的末尾有m个0，返回2^m
+			return k & (-k);
+		}
+
+		public void add(int idx, int val) {// 让nums数组idx位置的元素增加val
+			int plus = val;
+			int i = idx + 1;
+			n[i] += plus;
+			while (i < c.length) {
+				c[i] += plus;
+				i += lowbit(i);
+			}
+		}
+
+		public int sum(int i, int j) {// 求nums数组i～j下标范围内的元素的和
+			int low = 0;// nums数组中0～i-1范围的元素的和
+			int high = 0;// nums数组中0～j范围的元素的和
+			i = i + 1 - 1;
+			++j;// i和j转化为c[],a[]中的下标
+			while (i > 0) {
+				low += c[i];
+				i -= lowbit(i);
+			}
+			while (j > 0) {
+				high += c[j];
+				j -= lowbit(j);
+			}
+			return high - low;
+		}
+
+		public TreeArray(int[] nums) {// 根据nums[]原始数组建立树状数组
+			n = new int[nums.length + 1];
+			c = new int[nums.length + 1];
+			for (int i = 0; i < nums.length; ++i) {
+				add(i, nums[i]);
+			}
+		}
+	}
+
+	public List<Integer> countSmaller(int[] nums) {
+		Stack<Integer> tempResult = new Stack<Integer>();
+		List<Integer> result = new ArrayList<Integer>();
+
+		if (nums.length == 0)
+			return result;
+
+		int min = 999999;
+		int max = -999999;
+		for (int i = 0; i < nums.length; ++i) {
+			min = Math.min(min, nums[i]);
+			max = Math.max(max, nums[i]);
+		}
+		int[] temp = new int[max - min + 1];// 用于初始化树状数组
+		TreeArray treeArray = new TreeArray(temp);// 全0的树状数组，把nums[]中的数字映射到0~max-min，并+1，作为树状数组的下标
+
+		// 从nums[]数组的右边向左边遍历
+		for (int i = nums.length - 1; i >= 0; --i) {
+			int num = nums[i] - min;// 把nums中的数字映射到0~max-min
+			int sum = treeArray.sum(0, num - 1);// 在nums[i]右边比nums[i]小的元素数目
+			tempResult.push(sum);
+			treeArray.add(num, 1);
+		}
+		while (!tempResult.isEmpty())
+			result.add(tempResult.pop());
+		return result;
+	}
+}
