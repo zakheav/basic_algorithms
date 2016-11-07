@@ -1,0 +1,15 @@
+public class Solution {
+	public boolean canJump(int[] nums) {
+		boolean[] dp = new boolean[nums.length];// 记录每个pos是否可以达到
+		dp[0] = true;
+		for (int i = 1; i < nums.length; ++i) {
+			for (int j = i - 1; j >= 0; --j) {
+				if (dp[j] && i - j <= nums[j]) {
+					dp[i] = true;
+					break;
+				}
+			}
+		}
+		return dp[nums.length - 1];
+	}
+}
