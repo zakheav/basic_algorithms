@@ -1,0 +1,31 @@
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	private void dfs(int[] nums, boolean[] used, List<Integer> path) {
+		if (path.size() == nums.length) {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int num : path) {
+				result.add(num);
+			}
+			results.add(result);
+		} else {
+			for (int i = 0; i < nums.length; ++i) {
+				if (!used[i]) {
+					used[i] = true;
+					path.add(nums[i]);
+					dfs(nums, used, path);
+
+					path.remove(path.size() - 1);// 把path中的最后一个元素删除掉
+					used[i] = false;
+				}
+			}
+		}
+	}
+
+	public List<List<Integer>> permute(int[] nums) {
+		boolean[] used = new boolean[nums.length];
+		List<Integer> path = new ArrayList<Integer>();
+		dfs(nums, used, path);
+		return results;
+	}
+}
