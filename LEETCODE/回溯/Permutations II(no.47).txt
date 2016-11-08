@@ -1,4 +1,4 @@
-// 方法1 很慢
+// 方法一 很慢
 public class Solution {
 	private List<List<Integer>> results = new ArrayList<List<Integer>>();
 	private Set<String> hashSet = new HashSet<String>();// 用于去重
