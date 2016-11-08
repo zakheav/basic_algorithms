@@ -1,0 +1,79 @@
+// 方法1 很慢
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+	private Set<String> hashSet = new HashSet<String>();// 用于去重
+
+	private void dfs(int[] nums, boolean[] used, List<Integer> path, StringBuffer key) {
+		if (path.size() == nums.length && !hashSet.contains(key.toString())) {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int num : path) {
+				result.add(num);
+			}
+			results.add(result);
+			hashSet.add(key.toString());
+		} else {
+			for (int i = 0; i < nums.length; ++i) {
+				if (!used[i]) {
+					int oldLength = key.length();
+					used[i] = true;
+					path.add(nums[i]);
+					key.append(nums[i]);
+
+					dfs(nums, used, path, key);
+
+					key.delete(oldLength, key.length());
+					path.remove(path.size() - 1);
+					used[i] = false;
+				}
+			}
+		}
+	}
+
+	public List<List<Integer>> permuteUnique(int[] nums) {
+		boolean[] used = new boolean[nums.length];
+		List<Integer> path = new ArrayList<Integer>();
+		StringBuffer key = new StringBuffer();
+		dfs(nums, used, path, key);
+		return results;
+	}
+}
+
+// 方法二 很快
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	private void dfs(int[] nums, boolean[] used, List<Integer> path) {
+		if (path.size() == nums.length) {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int num : path) {
+				result.add(num);
+			}
+			results.add(result);
+		} else {
+			for (int i = 0; i < nums.length; ++i) {
+				// 由于nums数组已经排序，即按照相同数字分了组
+				// 下面这个循环保证了结果中相同的数字间只有一种选择次序
+				while (i < nums.length - 1 && !used[i + 1] && nums[i] == nums[i + 1]) {
+					++i;
+				}
+				if (!used[i]) {
+					used[i] = true;
+					path.add(nums[i]);
+
+					dfs(nums, used, path);
+
+					path.remove(path.size() - 1);
+					used[i] = false;
+				}
+			}
+		}
+	}
+
+	public List<List<Integer>> permuteUnique(int[] nums) {
+		boolean[] used = new boolean[nums.length];
+		List<Integer> path = new ArrayList<Integer>();
+		Arrays.sort(nums);// 排序
+		dfs(nums, used, path);
+		return results;
+	}
+}

@@ -13,9 +13,10 @@ public class Solution {
 				if (!used[i]) {
 					used[i] = true;
 					path.add(nums[i]);
+					
 					dfs(nums, used, path);
 
-					path.remove(path.size() - 1);// 把path中的最后一个元素删除掉
+					path.remove(path.size() - 1);
 					used[i] = false;
 				}
 			}
