@@ -1,0 +1,31 @@
+public class Solution {
+	private List<String> results = new ArrayList<String>();
+
+	private void dfs(StringBuffer sb, int pair, int leftPartCount, int rightPartCount) {
+		if (sb.length() == pair * 2) {
+			results.add(sb.toString());
+		} else {
+			if (leftPartCount < pair) {// 加入“(”
+				sb.append("(");
+				++leftPartCount;
+				dfs(sb, pair, leftPartCount, rightPartCount);
+				--leftPartCount;
+				sb.delete(sb.length() - 1, sb.length());
+			}
+			if (rightPartCount < pair && leftPartCount > rightPartCount) {// 加入“)”
+				sb.append(")");
+				++rightPartCount;
+				dfs(sb, pair, leftPartCount, rightPartCount);
+				--rightPartCount;
+				sb.delete(sb.length() - 1, sb.length());
+			}
+		}
+
+	}
+
+	public List<String> generateParenthesis(int n) {
+		StringBuffer sb = new StringBuffer();
+		dfs(sb, n, 0, 0);
+		return results;
+	}
+}
