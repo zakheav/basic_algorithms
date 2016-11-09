@@ -1,0 +1,38 @@
+// 这道题的搜索空间是一张图，和其他的题目的搜索空间（比如N皇后）是树相比，有一些不同
+public class Solution {
+	private boolean result = false;
+
+	// map用于记录当前搜索占据的路径，防止路径成环
+	private void dfs(char[][] board, int[][] map, String word, int wordIdx, int row, int col) {
+		if (wordIdx == word.length()) {
+			result = true;
+		} else {
+			if (row >= 0 && row < board.length && col >= 0 && col < board[0].length) {
+				if (map[row][col] != 1 && board[row][col] == word.charAt(wordIdx)) {
+					map[row][col] = 1;
+					if (!result)
+						dfs(board, map, word, wordIdx + 1, row - 1, col);// 尝试当前位置的上方
+					if (!result)
+						dfs(board, map, word, wordIdx + 1, row + 1, col);// 尝试当前位置的下方
+					if (!result)
+						dfs(board, map, word, wordIdx + 1, row, col - 1);// 尝试当前位置的左方
+					if (!result)
+						dfs(board, map, word, wordIdx + 1, row, col + 1);// 尝试当前位置的右方
+					map[row][col] = 0;
+				}
+			}
+		}
+	}
+
+	public boolean exist(char[][] board, String word) {
+		int[][] map = new int[board.length][board[0].length];
+		for (int i = 0; i < board.length; ++i) {
+			for (int j = 0; j < board[0].length; ++j) {
+				dfs(board, map, word, 0, i, j);
+				if (result == true)
+					return true;
+			}
+		}
+		return false;
+	}
+}
