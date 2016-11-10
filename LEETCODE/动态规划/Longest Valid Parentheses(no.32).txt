@@ -1,0 +1,35 @@
+// 状态转移公式dp[i]记录以s(i)结尾的子串的最长括号对长度
+// s(i) == '('， 则dp[i] = 0
+// s(i) == ')' && s(dp[i-j-1]) == '(' 其中j=dp[i-1]，则dp[i] = dp[i-1] + 2 + dp[i-j-2] (有可能链接之前的括号对 比如 ()(),后一个()连接着前一个())
+public class Solution {
+	public int longestValidParentheses(String s) {
+		int[] dp = new int[s.length()];
+		int max = 0;
+		for (int i = 0; i < s.length(); ++i) {
+			if (s.charAt(i) == '(') {
+				dp[i] = 0;
+			} else {
+				if (i > 0) {
+					int j = dp[i - 1];
+					if (i - j - 1 >= 0) {
+						if (s.charAt(i - j - 1) == '(') {
+							if (i - j - 2 >= 0) {
+								dp[i] = dp[i - 1] + 2 + dp[i - j - 2];
+							} else {
+								dp[i] = dp[i - 1] + 2;
+							}
+							max = Math.max(dp[i], max);
+						} else {
+							dp[i] = 0;
+						}
+					} else {
+						dp[i] = 0;
+					}
+				} else {
+					dp[i] = 0;
+				}
+			}
+		}
+		return max;
+	}
+}
