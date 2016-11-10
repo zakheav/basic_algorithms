@@ -1,0 +1,40 @@
+// 状态转移公式 ：dp[i][j]表示s的 0~i子串在t的0~j子串中出现的次数
+// dp[i][j] = dp[i][j-1] + dp[i-1][j-1] * 1      s(i)==s(j)
+// dp[i][j] = dp[i][j-1]                         s(i)!=s(j)
+public class Solution {
+	public int numDistinct(String s, String t) {
+		String temp;
+		temp = s;
+		s = t;
+		t = temp;// 为了和392题保持一致
+		
+		if (s.length() == 0 || t.length() == 0 || s.length() > t.length())
+			return 0;
+		int[][] dp = new int[s.length()][t.length()];
+		for (int j = 0; j < t.length(); ++j) {
+			if (j == 0) {
+				if (s.charAt(0) == t.charAt(j)) {
+					dp[0][j] = 1;
+				} else {
+					dp[0][j] = 0;
+				}
+			} else {
+				if (s.charAt(0) == t.charAt(j)) {
+					dp[0][j] = dp[0][j - 1] + 1;
+				} else {
+					dp[0][j] = dp[0][j - 1];
+				}
+			}
+		} // 初始化dp第一行
+		for (int i = 1; i < s.length(); ++i) {
+			for (int j = i; j < t.length(); ++j) {
+				if (s.charAt(i) == t.charAt(j)) {
+					dp[i][j] = dp[i][j - 1] + dp[i - 1][j - 1];
+				} else {
+					dp[i][j] = dp[i][j - 1];
+				}
+			}
+		}
+		return dp[s.length() - 1][t.length() - 1];
+	}
+}

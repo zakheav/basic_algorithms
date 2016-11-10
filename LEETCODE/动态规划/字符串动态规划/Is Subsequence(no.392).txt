@@ -1,23 +1,27 @@
+// 状态转移公式：dp[i][j]表示s的0~i是t的0~j的子串
+// dp[i][j] = dp[i][j-1] || dp[i-1][j-1]   s(i)==t(j)
+// dp[i][j] = dp[i][j-1]                   s(i)!=t(j)
 public class Solution {// 内存会超
 	public boolean isSubsequence(String s, String t) {
 		if (s.length() == 0)
 			return true;
 		if (s.length() > t.length())
 			return false;
-		// dp[i][j]表示s的0~i是t的0~j的子串
 		boolean[][] dp = new boolean[s.length()][t.length()];
-		// 状态转移方程
-		// dp[i][j]=dp[i][j-1]||dp[i-1][j-1]&&s[i]==t[j]
 		for (int j = 0; j < t.length(); ++j) {
 			if (j == 0) {
 				dp[0][j] = s.charAt(0) == t.charAt(0);
 			} else {
 				dp[0][j] = dp[0][j - 1] || s.charAt(0) == t.charAt(j);
 			}
-		} // 初始化dp的第一行
+		}// 初始化dp的第一行
 		for (int i = 1; i < s.length(); ++i) {
 			for (int j = i; j < t.length(); ++j) {
-				dp[i][j] = dp[i][j - 1] || dp[i - 1][j - 1] && s.charAt(i) == t.charAt(j);
+				if(s.charAt(i) == t.charAt(j)) {
+					dp[i][j] = dp[i][j-1] || dp[i-1][j-1];
+				} else {
+					dp[i][j] = dp[i][j-1];
+				}
 			}
 		}
 		return dp[s.length() - 1][t.length() - 1];
