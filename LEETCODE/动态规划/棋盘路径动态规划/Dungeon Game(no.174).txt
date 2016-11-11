@@ -1,0 +1,24 @@
+// 和Unique Paths II不同，这道题要从终点向起点动态规划
+// 转移状态公式：dp[i][j]表示(i,j)点到终点所需要的最少的生命值
+// dp[i][j] = max(0, min(dp[i][j+1]-dungeon[i][j], dp[i+1][j]-dungeon[i][j]))
+// 由于骑士如果血量为零立刻就死，所以状态转移公式最外层加一个max(0, ***)，然后最终结果+1
+public class Solution {
+	public int calculateMinimumHP(int[][] dungeon) {
+		int row = dungeon.length;
+		int col = dungeon[0].length;
+		int[][] dp = new int[row][col];
+		dp[row - 1][col - 1] = Math.max(0, 0 - dungeon[row - 1][col - 1]);
+		for (int j = col - 2; j >= 0; --j) {
+			dp[row - 1][j] = Math.max(0, dp[row - 1][j + 1] - dungeon[row - 1][j]);
+		} // 初始化最后一行
+		for (int i = row - 2; i >= 0; --i) {
+			dp[i][col - 1] = Math.max(0, dp[i + 1][col - 1] - dungeon[i][col - 1]);
+		} // 初始化最后一列
+		for (int i = row - 2; i >= 0; --i) {
+			for (int j = col - 2; j >= 0; --j) {
+				dp[i][j] = Math.max(0, Math.min(dp[i][j + 1] - dungeon[i][j], dp[i + 1][j] - dungeon[i][j]));
+			}
+		}
+		return dp[0][0] + 1;
+	}
+}
