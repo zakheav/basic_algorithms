@@ -1,0 +1,42 @@
+public class Solution {
+	private List<String> results = new ArrayList<String>();
+	private List<List<Integer>> dp = new ArrayList<List<Integer>>();// dp[i]存储了源字符串0~i部分最后一刀后面最近的下标的所有情况
+
+	private void dfs(int end, List<String> path, String s) {
+		if (end == -1) {
+			StringBuffer result = new StringBuffer();
+			for (int i = path.size() - 1; i >= 0; --i) {
+				result.append(path.get(i) + " ");
+			}
+			result.delete(result.length() - 1, result.length());
+			results.add(result.toString());
+		} else {
+			for (int i = 0; i < dp.get(end).size(); ++i) {
+				String subString = s.substring(dp.get(end).get(i), end + 1);
+				path.add(subString);
+				dfs(dp.get(end).get(i) - 1, path, s);
+				path.remove(path.size() - 1);
+			}
+		}
+	}
+
+	public List<String> wordBreak(String s, Set<String> wordDict) {
+		for (int i = 0; i < s.length(); ++i) {
+			dp.add(new ArrayList<Integer>());
+		}
+		// 构建dp
+		for (int end = 0; end < s.length(); ++end) {
+			for (int breakIdx = end; breakIdx >= 0; --breakIdx) {// breakIdx存储了最后一刀后面最近的下标
+				if (breakIdx == 0 || dp.get(breakIdx - 1).size() > 0) {// breakIdx之前的部分是可分的
+					String subString = s.substring(breakIdx, end + 1);
+					if (wordDict.contains(subString)) {// subString在wordDict中存在
+						dp.get(end).add(breakIdx);
+					}
+				}
+			}
+		}
+		// 在dp上进行dfs，构建results
+		dfs(s.length() - 1, new ArrayList<String>(), s);
+		return results;
+	}
+}

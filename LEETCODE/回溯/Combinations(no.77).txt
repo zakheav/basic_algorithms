@@ -1,0 +1,26 @@
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	private void dfs(int n, int k, int begin, List<Integer> path) {
+		if (path.size() == k || begin > n) {
+			if (path.size() == k) {
+				List<Integer> result = new ArrayList<Integer>();
+				for (int num : path) {
+					result.add(num);
+				}
+				results.add(result);
+			}
+		} else {
+			for (int i = begin; i <= n; ++i) {
+				path.add(i);
+				dfs(n, k, i + 1, path);
+				path.remove(path.size() - 1);
+			}
+		}
+	}
+
+	public List<List<Integer>> combine(int n, int k) {
+		dfs(n, k, 1, new ArrayList<Integer>());
+		return results;
+	}
+}

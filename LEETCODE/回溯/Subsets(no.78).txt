@@ -1,0 +1,25 @@
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	private void dfs(int[] nums, int idx, List<Integer> path) {
+		if (idx == nums.length) {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int num : path) {
+				result.add(num);
+			}
+			results.add(result);
+		} else {
+			// idx对应的放入path中
+			path.add(nums[idx]);
+			dfs(nums, idx + 1, path);
+			// idx对应的元素不放入path中
+			path.remove(path.size() - 1);
+			dfs(nums, idx + 1, path);
+		}
+	}
+
+	public List<List<Integer>> subsets(int[] nums) {
+		dfs(nums, 0, new ArrayList<Integer>());
+		return results;
+	}
+}
