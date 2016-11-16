@@ -1,0 +1,29 @@
+// 状态转移公式：dp[i][j]表示s1中的0~i部分和s2中的0~j部分是否可以组成s3中的0~i+j部分（s1,s2,s3中的第一个字符的下标从1开始）
+// dp[i][j] = dp[i-1][j] && s1[i] == s3[i+j] || dp[i][j-1] && s2[j] == s3[i+j]
+public class Solution {
+	public boolean isInterleave(String s1, String s2, String s3) {
+		if (s1.length() + s2.length() != s3.length())
+			return false;
+		boolean[][] dp = new boolean[s1.length() + 1][s2.length() + 1];
+		dp[0][0] = true;
+		for (int j = 1; j <= s2.length(); ++j) {// 初始化dp第一行
+			char s2Char = s2.charAt(j - 1);
+			char s3Char = s3.charAt(j - 1);
+			dp[0][j] = s2Char == s3Char && dp[0][j - 1];
+		}
+		for (int i = 1; i <= s1.length(); ++i) {// 初始化dp第一列
+			char s1Char = s1.charAt(i - 1);
+			char s3Char = s3.charAt(i - 1);
+			dp[i][0] = s1Char == s3Char && dp[i - 1][0];
+		}
+		for (int i = 1; i <= s1.length(); ++i) {
+			for (int j = 1; j <= s2.length(); ++j) {
+				char s1Char = s1.charAt(i - 1);
+				char s2Char = s2.charAt(j - 1);
+				char s3Char = s3.charAt(i + j - 1);
+				dp[i][j] = dp[i - 1][j] && s1Char == s3Char || dp[i][j - 1] && s2Char == s3Char;
+			}
+		}
+		return dp[s1.length()][s2.length()];
+	}
+}
