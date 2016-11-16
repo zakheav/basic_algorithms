@@ -1,0 +1,36 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+ 
+// 状态转移公式：对这棵树进行后序遍历。
+// max1表示偷窃当前节点情况，以当前节点为根的子树获取的最大值；max2表示不偷窃当前节点情况，以当前节点为根的子树获取的最大值
+// nowNode.max1 = nowNode.left.max2 + nowNode.right.max2 + nowNode.val
+// nowNode.max2 = max(nowNode.left.max1, nowNode.left.max2) + max(nowNode.right.max1, nowNode.right.max2)
+public class Solution {
+	private int[] dp(TreeNode nowNode) {
+		int[] left_max;
+		int[] right_max;
+		int[] now_max = new int[2];
+
+		if (nowNode == null)
+			return now_max;
+		else {
+			left_max = dp(nowNode.left);
+			right_max = dp(nowNode.right);
+			now_max[0] = left_max[1] + right_max[1] + nowNode.val;
+			now_max[1] = Math.max(left_max[0], left_max[1]) + Math.max(right_max[0], right_max[1]);
+			return now_max;
+		}
+	}
+
+	public int rob(TreeNode root) {
+		int[] root_max = dp(root);
+		return Math.max(root_max[0], root_max[1]);
+	}
+}

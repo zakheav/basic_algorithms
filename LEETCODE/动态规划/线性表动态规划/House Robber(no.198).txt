@@ -1,0 +1,41 @@
+// 状态转移公式：dp1[i]表示0～i区间最大值，dp2[i] = true表示0~i区间达到最大值的时候i号住户被偷了
+// dp2[i-1] = true:  dp1[i] = max(dp1[i-1], dp1[i-2]+nums[i]); 并根据dp1[i]的选取方式更新dp2[i]
+// dp2[i-1] = false: dp1[i] = dp1[i-1]+nums[i]; dp2[i] = true;
+public class Solution {
+	public int rob(int[] nums) {
+		int[] dp1 = new int[nums.length];
+		boolean[] dp2 = new boolean[nums.length];
+		if (nums.length == 0) {
+			return 0;
+		}
+		dp1[0] = nums[0];
+		dp2[0] = true;
+		if (nums.length >= 2) {
+			if (nums[1] > nums[0]) {
+				dp1[1] = nums[1];
+				dp2[1] = true;
+			} else {
+				dp1[1] = nums[0];
+				dp2[1] = false;
+			}
+
+			for (int i = 2; i < nums.length; ++i) {
+				if (dp2[i - 1]) {
+					if (dp1[i - 1] > dp1[i - 2] + nums[i]) {
+						dp1[i] = dp1[i - 1];
+						dp2[i] = false;
+					} else {
+						dp1[i] = dp1[i - 2] + nums[i];
+						dp2[i] = true;
+					}
+				} else {
+					dp1[i] = dp1[i - 1] + nums[i];
+					dp2[i] = true;
+				}
+			}
+		}
+		return dp1[nums.length - 1];
+	}
+}
+// 对于把房子数组变成一个环形（数组的首尾是相邻的）
+// 方法是把nums的开头元素添加到nums的结尾处，尝试偷窃nums开头和结尾；不偷窃nums开头和结尾两种情况，然后统计出结果最大的情况
