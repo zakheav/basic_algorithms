@@ -1,0 +1,36 @@
+public class Solution {
+	private List<Integer> results = new ArrayList<Integer>();
+
+	public List<Integer> findSubstring(String s, String[] words) {
+		if (words.length == 0)
+			return results;
+		Map<String, Integer> wordsCount = new HashMap<String, Integer>();// 记录words中每个词出现的次数
+		for (String word : words) {
+			int oldCounter = wordsCount.get(word) == null ? 0 : wordsCount.get(word);
+			wordsCount.put(word, oldCounter + 1);
+		}
+		int wordsTotalCount = words.length;
+		int wordLength = words[0].length();
+		for (int i = 0; i <= s.length() - wordLength * wordsTotalCount; ++i) {
+			Map<String, Integer> tempCount = new HashMap<String, Integer>();// 统计当前考虑的一段出现每个单词的数目
+			int j;
+			for (j = 0; j < wordsTotalCount; ++j) {
+				String subString = s.substring(i + j * wordLength, i + (j + 1) * wordLength);
+				if (wordsCount.containsKey(subString)) {
+					int wordNowCount = tempCount.get(subString) == null ? 0 : tempCount.get(subString);
+					if (wordNowCount < wordsCount.get(subString)) {
+						tempCount.put(subString, wordNowCount + 1);
+					} else {
+						break;
+					}
+				} else {
+					break;
+				}
+			}
+			if (j == wordsTotalCount) {
+				results.add(i);
+			}
+		}
+		return results;
+	}
+}
