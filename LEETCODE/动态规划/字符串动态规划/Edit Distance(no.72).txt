@@ -1,7 +1,7 @@
 // 状态转移公式：dp[i][j]表示word1的0~i部分变化为word2的0~j的部分需要的最少变化次数
-// dp[i][j] = min( dp[i-1][j] + 1  word1的0~i-1部分先变成word2的0~j部分，然后word1的0~i部分去掉第i个字母
+// dp[i][j] = min{ dp[i-1][j] + 1  word1的0~i-1部分先变成word2的0~j部分，然后word1的0~i部分去掉第i个字母
 //                 dp[i][j-1] + 1  word1的0~i部分先变成word2的0~j-1部分，然后word1再添加一个word2的j号字母
-//                 dp[i-1][j-1] + f(word1(i), word2(j))  word1的0~i-1部分先变成word2的0~j-1部分，然后尝试word1(i)替换成word2(j)
+//                 dp[i-1][j-1] + f(word1(i), word2(j))  word1的0~i-1部分先变成word2的0~j-1部分，然后尝试word1(i)替换成word2(j) }
 //                 f(a,b) = 1 当且仅当 a == b
 public class Solution {
 	public int minDistance(String word1, String word2) {
