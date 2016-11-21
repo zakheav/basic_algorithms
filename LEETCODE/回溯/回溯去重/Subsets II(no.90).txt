@@ -1,0 +1,34 @@
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	private void dfs(int[] nums, int idx, List<Integer> path) {
+		if (idx == nums.length) {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int num : path) {
+				result.add(num);
+			}
+			results.add(result);
+		} else {
+			int counter = 1;// 记录每一组数字的数量
+			while (idx + 1 < nums.length && nums[idx] == nums[idx + 1]) {// idx移动到每一组的最后一个
+				++idx;
+				++counter;
+			}
+			for (int i = 0; i <= counter; ++i) {// 尝试向path中加入当前组的数字0~counter次
+				if (i != 0)
+					path.add(nums[idx]);
+				dfs(nums, idx + 1, path);
+			}
+			// 清除path中这一组的数据
+			for (int i = 0; i < counter; ++i) {
+				path.remove(path.size() - 1);
+			}
+		}
+	}
+
+	public List<List<Integer>> subsetsWithDup(int[] nums) {
+		Arrays.sort(nums);// 相同的数字被分成了一组
+		dfs(nums, 0, new ArrayList<Integer>());
+		return results;
+	}
+}

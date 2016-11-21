@@ -1,0 +1,37 @@
+class MyComparator implements Comparator<Integer> {
+	public int compare(Integer o1, Integer o2) {
+		if (o1 < o2) {
+			return 1;
+		} else if (o1 == o2) {
+			return 0;
+		} else {
+			return -1;
+		}
+	}
+}
+
+public class Solution {
+	public int kthSmallest(int[][] matrix, int k) {
+		// 构建一个大根堆
+		PriorityQueue<Integer> maxHeap = new PriorityQueue(11, new MyComparator());
+		boolean finish = false;
+		for (int i = 0; i < matrix.length && !finish; ++i) {
+			for (int j = 0; j < matrix[0].length && !finish; ++j) {
+				if (maxHeap.size() == k) {
+					int max = maxHeap.peek();
+					if (max > matrix[i][j]) {// 当前元素比堆顶的元素小
+						maxHeap.poll();
+						maxHeap.offer(matrix[i][j]);
+					} else {// 当前的元素不比堆顶的元素小
+						if (j == 0) {// 优化
+							finish = true;
+						}
+					}
+				} else {
+					maxHeap.offer(matrix[i][j]);
+				}
+			}
+		}
+		return maxHeap.peek();
+	}
+}
