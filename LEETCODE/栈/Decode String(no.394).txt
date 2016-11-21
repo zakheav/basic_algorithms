@@ -1,0 +1,48 @@
+public class Solution {
+    public String decodeString(String s) {
+        Stack<Integer> pairStack = new Stack<Integer>();// 用于寻找第一个最外层的括号
+        int leftIdx = -1;// 第一个最外层左边括号下标
+        int rightIdx = -1;// 第一个最外层右边括号的下标
+        int times = 0;// 括号中的字符串需要重复的次数
+        for(int i=0; i<s.length(); ++i) {
+        	if(s.charAt(i) == '[') {
+        		leftIdx = i;
+        		pairStack.push(1);
+        		break;
+        	}
+        }// 找到第一个最外层左边的括号
+        if(leftIdx != -1) {
+        	// 解析times
+        	int idx = 0;
+        	for(idx=leftIdx-1; idx>=0; --idx) {
+        		if(s.charAt(idx) < '0' || s.charAt(idx) > '9') {
+        			break;
+        		}
+        	}
+        	times = Integer.parseInt(s.substring(idx+1, leftIdx));
+        	for(int i=leftIdx+1; i<s.length(); ++i) {
+        		if(s.charAt(i) == '[') {
+        			pairStack.push(1);
+        		} else if(s.charAt(i) == ']') {
+        			pairStack.pop();
+        			if(pairStack.isEmpty()) {
+        				rightIdx = i;
+        				break;
+        			}
+        		}
+        	}// 找到第一个最外层右边的括号
+        	String leftPart = s.substring(0, idx+1);
+        	String rightPart = s.substring(rightIdx+1, s.length());
+        	String temp = decodeString(s.substring(leftIdx+1, rightIdx));// 处理第一个最外层的括号
+        	StringBuffer middlePart = new StringBuffer();
+        	middlePart.append(leftPart);
+        	for(int i=1; i<=times; ++i) {
+        		middlePart.append(temp);
+        	}
+        	middlePart.append(rightPart);
+        	return decodeString(middlePart.toString());// 处理之后的最外层括号
+        } else {
+        	return s;
+        }
+    }
+}
