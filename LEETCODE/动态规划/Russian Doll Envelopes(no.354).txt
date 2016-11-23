@@ -1,0 +1,43 @@
+public class Solution {
+	class Envelope {
+		int width;
+		int height;
+
+		Envelope(int width, int height) {
+			this.width = width;
+			this.height = height;
+		}
+	}
+
+	public int maxEnvelopes(int[][] envelopes) {
+		int length = envelopes.length;
+		Envelope[] sortedEnvelopes = new Envelope[length];
+		int index = 0;
+		for (int[] num : envelopes) {
+			sortedEnvelopes[index++] = new Envelope(num[0], num[1]);
+		}
+		Arrays.sort(sortedEnvelopes, new Comparator<Envelope>() {
+			public int compare(Envelope e1, Envelope e2) {
+				if (e1.width != e2.width)
+					return e1.width - e2.width;
+				return e1.height - e2.height;
+			}
+		});// 排序
+		
+		int[] count = new int[length];// 动态规划数组
+		int maxCount = 0;
+		for (int i = 0; i < length; i++) {
+			Envelope cur = sortedEnvelopes[i];
+			count[i] = 1;
+			for (int j = i - 1; j >= 0; j--) {
+				Envelope tmp = sortedEnvelopes[j];
+				if (tmp.width < cur.width && tmp.height < cur.height && count[j] + 1 > count[i]) {
+					count[i] = count[j] + 1;
+				}
+			}
+			if (count[i] > maxCount)
+				maxCount = count[i];
+		}
+		return maxCount;
+	}
+}

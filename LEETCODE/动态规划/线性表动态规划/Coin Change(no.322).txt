@@ -1,0 +1,19 @@
+// 状态转移公式：dp[i]表示amount=i时最少需要多少个硬币
+// dp[i] = min(dp[j] + 1)    0<=j<i，且j的取值要求i-j在硬币列表中
+public class Solution {
+	public int coinChange(int[] coins, int amount) {
+		int[] dp = new int[amount + 1];
+		dp[0] = 0;
+		for (int i = 1; i <= amount; ++i) {
+			int min = 999999;
+			for (int coinIdx = 0; coinIdx < coins.length; ++coinIdx) {
+				int j = i - coins[coinIdx];
+				if (dp[j] != -1 && dp[j] + 1 < min) {
+					min = dp[j] + 1;
+				}
+			}
+			dp[i] = min == 999999 ? -1 : min;
+		}
+		return dp[amount];
+	}
+}

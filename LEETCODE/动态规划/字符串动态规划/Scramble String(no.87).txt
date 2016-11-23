@@ -1,0 +1,6 @@
+// 状态转移公式：
+public class Solution {
+    public boolean isScramble(String s1, String s2) {
+        
+    }
+}

@@ -1,0 +1,28 @@
+// 状态转移公式 dp[i]记录以i下标元素结尾的等差数列子串的个数，dif[i]表示以i下标元素结尾的等差数列的公差
+// 子串长度要求至少为3
+// A[i] - A[i-1] == dif[i-1]: dp[i] = dp[i-1] + 1  dif[i] = dif[i-1]
+// A[i] - A[i-1] != dif[i-1]: dp[i] = 0            dif[i] = A[i] - A[i-1]
+public class Solution {
+	public int numberOfArithmeticSlices(int[] A) {
+		if (A.length < 3)
+			return 0;
+		int[] dp = new int[A.length];
+		int[] dif = new int[A.length];
+		dp[1] = 0;
+		dif[1] = A[1] - A[0];
+		for (int i = 2; i < A.length; ++i) {
+			if (A[i] - A[i - 1] == dif[i - 1]) {
+				dp[i] = dp[i - 1] + 1;
+				dif[i] = dif[i - 1];
+			} else {
+				dp[i] = 0;// 这保证了子串长度要求至少为3
+				dif[i] = A[i] - A[i - 1];
+			}
+		}
+		int counter = 0;
+		for (int i = 2; i < A.length; ++i) {
+			counter += dp[i];
+		}
+		return counter;
+	}
+}

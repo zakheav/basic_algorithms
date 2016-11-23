@@ -1,0 +1,18 @@
+// 状态转移公式：dp[i][j] 表示(i,j)点到最后一层经过路径的最小值
+// dp[i][j] = triangle[i][j] + min(dp[i+1][j], dp[i+1][j+1])
+public class Solution {
+	public int minimumTotal(List<List<Integer>> triangle) {
+		int height = triangle.size();
+		int bottom = triangle.get(height - 1).size();
+		int[][] dp = new int[height][bottom];
+		for (int j = 0; j < bottom; ++j) {
+			dp[height - 1][j] = triangle.get(height - 1).get(j);
+		}
+		for (int i = height - 2; i >= 0; --i) {
+			for (int j = 0; j < triangle.get(i).size(); ++j) {
+				dp[i][j] = triangle.get(i).get(j) + Math.min(dp[i + 1][j], dp[i + 1][j + 1]);
+			}
+		}
+		return dp[0][0];
+	}
+}
