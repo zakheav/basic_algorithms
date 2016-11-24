@@ -1,0 +1,22 @@
+/*
+当左端线段L小于右端线段R时，我们把L右移，这时舍弃的是L与右端其他线段（R-1, R-2, ...）组成的木桶，
+这些木桶是没必要判断的，因为这些木桶的容积肯定都没有L和R组成的木桶容积大
+*/
+public class Solution {
+	public int maxArea(int[] height) {
+		int left = 0;
+		int right = height.length - 1;
+		int max = 0;
+		while (left < right) {
+			// 每次移动短的那边
+			if (height[left] < height[right]) {
+				max = Math.max((right - left) * height[left], max);
+				++left;
+			} else {
+				max = Math.max((right - left) * height[right], max);
+				--right;
+			}
+		}
+		return max;
+	}
+}
