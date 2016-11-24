@@ -1,0 +1,22 @@
+public class Solution {
+	public int[] intersect(int[] nums1, int[] nums2) {
+		List<Integer> result = new ArrayList<Integer>();
+		Map<Integer, Integer> nums2hash = new HashMap<Integer, Integer>();// 记录nums2每个数字出现的次数
+		for (int i = 0; i < nums2.length; ++i) {
+			int oldCount = nums2hash.get(nums2[i]) == null ? 0 : nums2hash.get(nums2[i]);
+			nums2hash.put(nums2[i], ++oldCount);
+		}
+		for (int i = 0; i < nums1.length; ++i) {
+			int oldCount = nums2hash.get(nums1[i]) == null ? 0 : nums2hash.get(nums1[i]);
+			if (oldCount > 0) {
+				result.add(nums1[i]);
+				nums2hash.put(nums1[i], --oldCount);
+			}
+		}
+		int[] r = new int[result.size()];
+		for (int i = 0; i < result.size(); ++i) {
+			r[i] = result.get(i);
+		}
+		return r;
+	}
+}

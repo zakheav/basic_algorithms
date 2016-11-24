@@ -1,0 +1,27 @@
+// 状态转移公式：dp[i+1]记录字符串s的0~i部分的解码种类
+// 依次执行下面的两步：
+	if子串(i~i)对应一个字母          dp[i+1] = dp[i]
+	if子串(i-1~i)对应一个字母     dp[i+1] += dp[i-1]
+public class Solution {
+    public int numDecodings(String s) {
+        if(s.length() == 0) return 0;
+    	int[] dp = new int[s.length()+1];
+    	dp[0] = 1;
+        for(int i=1; i<=s.length(); ++i) {
+        	int last1 = Integer.parseInt(s.substring(i-1, i));
+        	if(last1 > 0 && last1 < 27) {
+        		dp[i] = dp[i-1];
+        	}
+        	if(i>=2) {
+        	    String l2 = s.substring(i-2, i);
+        	    if(l2.charAt(0) != '0') {
+        	        int last2 = Integer.parseInt(s.substring(i-2, i));
+        		    if(last2 > 0 && last2 < 27) {
+        			    dp[i] += dp[i-2];
+        		    }
+        	    }
+        	}
+        }
+        return dp[s.length()];
+    }
+}
