@@ -1,0 +1,26 @@
+public class Solution {
+	public int threeSumClosest(int[] nums, int target) {
+		int result = 0;
+		int minDif = 999999;
+		Arrays.sort(nums);// 排序
+		for (int i = 0; i < nums.length; ++i) {
+			int right = nums.length - 1;
+			int left = i + 1;
+			while (left < right) {
+				int temp = nums[i] + nums[left] + nums[right];
+				if (Math.abs(temp - target) < minDif) {
+					result = temp;
+					minDif = Math.abs(temp - target);
+				}
+				if (temp < target) {
+					++left;
+				} else if (temp > target) {
+					--right;
+				} else {
+					return target;
+				}
+			}
+		}
+		return result;
+	}
+}

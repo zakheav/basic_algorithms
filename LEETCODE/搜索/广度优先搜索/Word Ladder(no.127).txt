@@ -1,0 +1,33 @@
+public class Solution {
+    public int ladderLength(String start, String end, Set<String> dict) {
+		if (start.equals(end) == true || start == null || end == null) {
+			return 0;
+		}
+		Queue<String> queue = new LinkedList<String>();
+		LinkedList<Integer> distanceQueue = new LinkedList<Integer>();// 记录当前节点所在的层数，也就是经过了多少次变换
+		queue.add(start);
+		distanceQueue.add(1);
+		int dist = 0;
+		while (!queue.isEmpty()) {
+			String str = (String) queue.poll();
+			dist = (int) distanceQueue.poll();
+			// 对当前单词的每个字符逐个测试，生成的新单词是否存在于字典中
+			for (int i = 0; i < str.length(); i++) {
+				char[] strCharArr = str.toCharArray();
+				for (char c = 'a'; c <= 'z'; c++) {
+					strCharArr[i] = c;
+					String newWord = new String(strCharArr);
+					if (dict.contains(newWord)) {
+						if (newWord.equals(end)) {
+							return dist + 1;
+						}
+						queue.add(newWord);
+						distanceQueue.add(dist + 1);
+						dict.remove(newWord);// 防止广度优先搜索出现循环的关键
+					}
+				}
+			}
+		}
+		return 0;
+	}
+}
