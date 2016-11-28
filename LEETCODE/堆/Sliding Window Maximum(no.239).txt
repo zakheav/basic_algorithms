@@ -1,0 +1,47 @@
+public class Solution {
+	public int[] maxSlidingWindow(int[] nums, int k) {
+		if (k == 0)
+			return new int[0];
+		Queue<Integer> window = new LinkedList<Integer>();
+		int[] result = new int[nums.length - k + 1];
+
+		int maxValue = -999999;
+		int maxIdx = -1;
+		for (int i = 0; i + k - 1 < nums.length; ++i) {
+			if (i == 0) {// window的生长阶段
+				for (int j = i; j <= i + k - 1; ++j) {
+					window.offer(nums[j]);
+					if (nums[j] > maxValue) {
+						maxValue = nums[j];
+						maxIdx = j;
+					}
+				}
+				result[i] = maxValue;
+			} else {
+				int newIdx = i + k - 1;
+				window.offer(nums[newIdx]);// 加入新的元素
+				if (maxValue == -999999) {// 重新计算maxValue，maxIdx
+					for (int j = i; j <= i + k - 1; ++j) {
+						window.offer(nums[j]);
+						if (nums[j] > maxValue) {
+							maxValue = nums[j];
+							maxIdx = j;
+						}
+					}
+				} else {// 更新maxValue，maxIdx
+					if (nums[newIdx] > maxValue) {
+						maxValue = nums[newIdx];
+						maxIdx = newIdx;
+					}
+				}
+				result[i] = maxValue;
+			}
+
+			window.poll();
+			if (maxIdx == i) {
+				maxValue = -999999;
+			}
+		}
+		return result;
+	}
+}
