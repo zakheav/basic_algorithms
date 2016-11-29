@@ -1,0 +1,52 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+
+	public List<List<Integer>> zigzagLevelOrder(TreeNode root) {
+		if (root == null)
+			return results;
+		Queue<TreeNode> queue = new LinkedList<TreeNode>();// 记录层序遍历的节点
+		Queue<Integer> levelQueue = new LinkedList<Integer>();// 记录每个节点的层数
+		queue.offer(root);
+		levelQueue.offer(1);
+		int nowLevel = 1;// 当前的层数
+		List<Integer> result = new ArrayList<Integer>();
+		while (!queue.isEmpty()) {
+			TreeNode nowNode = queue.poll();
+			int level = levelQueue.poll();
+			if (nowNode.left != null) {// 左边子节点非空
+				queue.offer(nowNode.left);
+				levelQueue.offer(level + 1);
+			}
+			if (nowNode.right != null) {// 右边节点非空
+				queue.offer(nowNode.right);
+				levelQueue.offer(level + 1);
+			}
+			if (level == nowLevel) {// 还处于当前层
+				result.add(nowNode.val);
+			} else {// 切换到了新的一层
+				if (nowLevel % 2 == 0) {
+					Collections.reverse(result);// 翻转数组
+				}
+				results.add(result);// 处理之前的层
+				result = new ArrayList<Integer>();// 生成新的数组
+				result.add(nowNode.val);
+				nowLevel = level;
+			}
+		}
+		// 处理最后一层
+		if (nowLevel % 2 == 0) {
+			Collections.reverse(result);
+		}
+		results.add(result);
+		return results;
+	}
+}
