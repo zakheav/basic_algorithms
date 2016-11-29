@@ -22,7 +22,7 @@ public class Solution {
 					return e1.width - e2.width;
 				return e1.height - e2.height;
 			}
-		});// 排序
+		});// 排序(字典序)
 		
 		int[] count = new int[length];// 动态规划数组
 		int maxCount = 0;
