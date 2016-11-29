@@ -1,0 +1,30 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	private int result = -99999;
+
+	private int PostOrderTraversal(TreeNode root) {// 后序遍历，找到以root节点为内部结点的sum最大的path
+		int left = 0;
+		int right = 0;
+		if (root.left != null) {
+			left = PostOrderTraversal(root.left);// 访问左枝
+		}
+		if (root.right != null) {
+			right = PostOrderTraversal(root.right);// 访问右枝
+		}
+		result = Math.max(result, left + root.val + right);// 计算以root节点为内部结点的sum最大的path
+		return Math.max(0, Math.max(left + root.val, root.val + right));// 返回非负的较大的那一枝
+	}
+
+	public int maxPathSum(TreeNode root) {
+		PostOrderTraversal(root);
+		return result;
+	}
+}
