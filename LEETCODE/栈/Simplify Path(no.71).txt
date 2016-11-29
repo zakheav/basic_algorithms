@@ -1,0 +1,32 @@
+public class Solution {
+	public String simplifyPath(String path) {
+		Stack<String> stack = new Stack<String>();
+		for (int i = 0; i < path.length();) {
+			// 分割出token
+			int j;
+			for (j = i + 1; j < path.length(); ++j) {
+				if (path.charAt(j) == '/') {
+					break;
+				}
+			}
+			String token = path.substring(i, j);
+			if (token.equals("/..")) {// 出栈
+				if (stack.isEmpty()) // 防止出空栈
+					stack.push("/");
+				stack.pop();
+			} else if (token.equals("/") || token.equals("/.")) {// 不入栈
+				// do nothing
+			} else {
+				stack.push(token);
+			}
+			i = j;
+		}
+		if (stack.isEmpty())
+			return "/";
+		String result = "";
+		while (!stack.isEmpty()) {
+			result = stack.pop() + result;
+		}
+		return result;
+	}
+}
