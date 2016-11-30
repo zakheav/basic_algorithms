@@ -1,4 +1,4 @@
-public class QuickSort{
+public class QuickSort {
 	public void sort(int[] nums, int low, int high) {
 		int pivot = nums[low];//  ‡÷·
 		int lowIdx = low;

@@ -1,0 +1,18 @@
+public class binarySearch_noSmallerThanKey {
+	public int bs(int[] nums, int num) {// 返回数字所在的下标位置
+		int high = nums.length - 1;
+		int low = 0;
+		while(low <= high) {
+			int mid = (low + high) / 2;
+			if(nums[mid] == num) {
+				return mid;
+			} else if(nums[mid] < num) {
+				low = mid + 1;
+			} else if(nums[mid] > num) {
+				high = mid - 1;
+			}
+		}
+		if(low == nums.length) return -1;// 不存在
+		return low;
+	}
+}
