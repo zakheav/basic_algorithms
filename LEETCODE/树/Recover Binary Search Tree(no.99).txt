@@ -1,0 +1,43 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	private List<TreeNode> temp = new ArrayList<TreeNode>();// 中序遍历的结果
+
+	private void inOrderTraversal(TreeNode root) {// 中序遍历
+		if (root.left != null)
+			inOrderTraversal(root.left);
+		temp.add(root);
+		if (root.right != null)
+			inOrderTraversal(root.right);
+	}
+
+	public void recoverTree(TreeNode root) {
+		if (root == null)
+			return;
+		inOrderTraversal(root);// 获得中序遍历的结果
+		// 寻找交换的两个节点（中序遍历结果左边第一个波峰，右边第一个波谷）
+		TreeNode node1 = null, node2 = null;
+		for (int i = 0; i < temp.size(); ++i) {
+			if (temp.get(i).val > temp.get(i + 1).val) {
+				node1 = temp.get(i);
+				break;
+			}
+		}
+		for (int i = temp.size() - 1; i >= 0; --i) {
+			if (temp.get(i).val < temp.get(i - 1).val) {
+				node2 = temp.get(i);
+				break;
+			}
+		}
+		int temp = node1.val;
+		node1.val = node2.val;
+		node2.val = temp;
+	}
+}
