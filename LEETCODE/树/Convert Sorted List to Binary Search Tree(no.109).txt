@@ -1,0 +1,59 @@
+/**
+ * Definition for singly-linked list.
+ * public class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) { val = x; }
+ * }
+ */
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+// 需要用到的知识：找链表的中间结点之前的节点
+public class Solution {
+	private ListNode[] find_PreMid_mid(ListNode head) {
+		ListNode[] result = new ListNode[2];
+		if (head == null)
+			return result;
+		ListNode pre = null;
+		ListNode slow = head;
+		ListNode fast = head.next;
+		while (fast != null && fast.next != null) {
+			pre = slow;
+			slow = slow.next;
+			fast = fast.next;
+			if (fast != null)
+				fast = fast.next;
+		}
+		result[0] = pre;// 中间结点之前的节点
+		result[1] = slow;// 中间结点
+		return result;
+	}
+
+	public TreeNode sortedListToBST(ListNode head) {
+		TreeNode root = null;
+		// 找到ListNode的中间结点以及中间之前的节点
+		ListNode[] mid_preMid = find_PreMid_mid(head);
+		// 构建根节点
+		if (mid_preMid[1] != null) // 中间结点不为null
+			root = new TreeNode(mid_preMid[1].val);
+		else
+			return null;
+
+		// 把ListNode拆分
+		if (mid_preMid[0] != null) {// 中间结点之前的节点不为null，构建左节点
+			mid_preMid[0].next = null;
+			root.left = sortedListToBST(head);
+		}
+		if (mid_preMid[1].next != null) {// 中间结点之后的节点不为null，构建右节点
+			root.right = sortedListToBST(mid_preMid[1].next);
+		}
+		return root;
+	}
+}
