@@ -1,0 +1,62 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	public TreeNode deleteNode(TreeNode root, int key) {
+		// 搜索到key所在节点以及其父节点
+		TreeNode prePtr = null;
+		TreeNode nowPtr = root;
+		while (nowPtr != null && nowPtr.val != key) {
+			prePtr = nowPtr;
+			if (nowPtr.val > key) {
+				nowPtr = nowPtr.left;
+			} else if (nowPtr.val < key) {
+				nowPtr = nowPtr.right;
+			}
+		}
+
+		if (nowPtr == null) {
+			return root;
+		} else {
+			TreeNode deletePtr = nowPtr;
+			do {
+				// 找到真正要删除的节点
+				if (deletePtr.left != null) {
+					prePtr = deletePtr;
+					deletePtr = deletePtr.left;
+					while (deletePtr.right != null) {// 一直向右走
+						prePtr = deletePtr;
+						deletePtr = deletePtr.right;
+					}
+				} else if (deletePtr.right != null) {
+					prePtr = deletePtr;
+					deletePtr = deletePtr.right;
+					while (deletePtr.left != null) {// 一直向左走
+						prePtr = deletePtr;
+						deletePtr = deletePtr.left;
+					}
+				}
+				int temp = nowPtr.val;
+				nowPtr.val = deletePtr.val;
+				deletePtr.val = temp;
+
+				nowPtr = deletePtr;
+			} while (deletePtr.left != null || deletePtr.right != null);
+
+			if (prePtr == null) // 要删除的是根节点
+				return null;
+			if (prePtr.left == deletePtr)
+				prePtr.left = null;
+			else
+				prePtr.right = null;
+
+			return root;
+		}
+	}
+}
