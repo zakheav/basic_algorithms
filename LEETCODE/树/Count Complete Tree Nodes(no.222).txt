@@ -1,0 +1,24 @@
+/**
+ * Definition for a binary tree node.
+ * public class TreeNode {
+ *     int val;
+ *     TreeNode left;
+ *     TreeNode right;
+ *     TreeNode(int x) { val = x; }
+ * }
+ */
+public class Solution {
+	public int countNodes(TreeNode root) {
+		TreeNode ptr = null;
+		int leftHeight = 0, rightHeight = 0;
+		for (ptr = root; ptr != null; ++leftHeight, ptr = ptr.left);// 一直向左找，获得leftHeight
+		for (ptr = root; ptr != null; ++rightHeight, ptr = ptr.right);// 一直向右找，获得rightHeight
+		if (leftHeight == 0 && rightHeight == 0)
+			return 0;
+		if (leftHeight == rightHeight) {// 说明当前子树是满二叉树
+			return (2 << (leftHeight - 1)) - 1;
+		} else {
+			return countNodes(root.left) + countNodes(root.right) + 1;
+		}
+	}
+}
