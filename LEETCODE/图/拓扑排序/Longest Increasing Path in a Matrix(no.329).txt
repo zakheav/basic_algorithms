@@ -1,0 +1,64 @@
+public class Solution {
+	private List<Set<Integer>> adjTable = new ArrayList<Set<Integer>>();// 出度邻接表
+	private List<Integer> tempList = new ArrayList<Integer>();// 记录拓扑排序过程中以每个点为终止的最长递增序列长度
+
+	public int longestIncreasingPath(int[][] matrix) {
+		if (matrix.length == 0)
+			return 0;
+		int pointNum = matrix.length * matrix[0].length;
+		for (int i = 0; i < pointNum; ++i) {// 初始化adjTable
+			adjTable.add(new HashSet<Integer>());
+		}
+		// 构建出度邻接表，当matrix中的两个元素a和b a<b时，a有一条有向边指向b
+		int idx = 0;// 矩阵中每个元素的索引号
+		for (int i = 0; i < matrix.length; ++i) {
+			for (int j = 0; j < matrix[0].length; ++j) {
+				tempList.add(1);
+				if (i - 1 >= 0 && matrix[i][j] < matrix[i - 1][j]) {// 检查是否和上面元素邻接
+					int adjIdx = idx - matrix[0].length;
+					adjTable.get(idx).add(adjIdx);
+				}
+				if (i + 1 < matrix.length && matrix[i][j] < matrix[i + 1][j]) {// 检查是否和下面元素邻接
+					int adjIdx = idx + matrix[0].length;
+					adjTable.get(idx).add(adjIdx);
+				}
+				if (j - 1 >= 0 && matrix[i][j] < matrix[i][j - 1]) {// 检查是否和左面元素邻接
+					int adjIdx = idx - 1;
+					adjTable.get(idx).add(adjIdx);
+				}
+				if (j + 1 < matrix[0].length && matrix[i][j] < matrix[i][j + 1]) {// 检查是否和右面元素邻接
+					int adjIdx = idx + 1;
+					adjTable.get(idx).add(adjIdx);
+				}
+				++idx;
+			}
+		}
+
+		int[] indgree = new int[pointNum];// 记录每个节点的入度
+		for (int i = 0; i < pointNum; ++i) {
+			for (int child : adjTable.get(i)) {
+				++indgree[child];
+			}
+		}
+		int maxLength = 0;
+		// 基于出度邻接表进行拓扑排序
+		Queue<Integer> queue = new LinkedList<Integer>();// 用于拓扑排序
+		for (int i = 0; i < pointNum; ++i) {
+			if (indgree[i] == 0) {
+				queue.offer(i);
+			}
+		}
+		while (!queue.isEmpty()) {
+			int now = queue.poll();
+			maxLength = Math.max(maxLength, tempList.get(now));// 处理now节点
+			for (int child : adjTable.get(now)) {// 处理now的邻接点
+				tempList.set(child, Math.max(tempList.get(child), tempList.get(now) + 1));
+				--indgree[child];
+				if (indgree[child] == 0) {// 把入度为0的节点加入queue
+					queue.offer(child);
+				}
+			}
+		}
+		return maxLength;
+	}
+}
