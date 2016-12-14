@@ -1,0 +1,29 @@
+public class Solution {
+	public int maxSumSubmatrix(int[][] matrix, int k) {
+		int row = matrix.length, col = matrix[0].length;
+		// 预处理，计算每一列的累加和
+		for (int j = 0; j < col; ++j) {
+			for (int i = 1; i < row; ++i) {
+				matrix[i][j] = matrix[i][j] + matrix[i - 1][j];
+			}
+		}
+		int max = -99999;
+		for (int i = 0; i < row; ++i) {
+			for (int j = 0; j <= i; ++j) {// 前两层循环用来枚举两行
+				TreeSet<Integer> set = new TreeSet<Integer>();// 记录目前为止访问过的nums的累加和
+				int sum = 0;// 累加和
+				set.add(0);// 这样才会把第一个元素加入subarray
+				for (int l = 0; l < col; ++l) {// 计算两行之间的条状地带的最大sum矩形
+					int e = matrix[i][l] - (j == 0 ? 0 : matrix[j - 1][l]);// l列j行~i行元素的累加和
+					sum += e;
+					// 在set中找到一个数n，保证sum-n<k且是最大的，即n>sum-k
+					Integer n = set.ceiling(sum - k);
+					if (n != null)
+						max = Math.max(max, sum - n);
+					set.add(sum);
+				}
+			}
+		}
+		return max;
+	}
+}

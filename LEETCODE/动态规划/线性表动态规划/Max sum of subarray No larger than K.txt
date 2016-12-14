@@ -1,0 +1,25 @@
+public class Solution {
+	public int maxSumSubarray(int[] nums, int k) {
+		// 由于nums中的数字有正有负，所以不可以使用滑动窗口的方法
+		int result = -99999;
+		int[] sums = new int[nums.length];
+		for (int i = 0; i < nums.length; ++i) {// 计算nums的累加和
+			sums[i] = i == 0 ? nums[i] : nums[i] + sums[i - 1];
+		}
+		TreeSet<Integer> set = new TreeSet<Integer>();// 记录目前为止访问过的nums的累加和
+		set.add(0);// 这样才会把第一个元素加入subarray
+		for (int i = 0; i < nums.length; ++i) {
+			// 在set中找到一个数n，保证sums[i]-n<k且是最大的，即n>sums[i]-k
+			Integer n = set.ceiling(sums[i] - k);
+			if (n != null)
+				result = Math.max(result, sums[i] - n);
+			set.add(sums[i]);
+		}
+		return result;
+	}
+
+	public static void main(String[] args) {
+		int[] array = { 2, 2, -1 };
+		System.out.println(new Solution().maxSumSubarray(array, 3));
+	}
+}

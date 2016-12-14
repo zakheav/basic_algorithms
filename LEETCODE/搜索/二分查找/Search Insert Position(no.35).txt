@@ -1,0 +1,24 @@
+// 思路，搜索大于等于target的最小的元素的下标
+public class Solution {
+    public int searchInsert(int[] nums, int target) {
+        int high = nums.length - 1;
+		int low = 0;
+		while(low <= high) {
+			int mid = (low + high) / 2;
+			if(nums[mid] == target) {
+				low = mid;
+				break;
+			} else if(nums[mid] < target) {
+				low = mid + 1;
+			} else if(nums[mid] > target) {
+				high = mid - 1;
+			}
+		}
+		if(low == nums.length) return low;// 不存在，直接返回数组的长度
+		// 考虑到有相同的元素情况，返回最左边那个
+		while(low - 1 >= 0 && nums[low - 1] == nums[low]) {
+			--low;
+		}
+		return low;
+    }
+}
