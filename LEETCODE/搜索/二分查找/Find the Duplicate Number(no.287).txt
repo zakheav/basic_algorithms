@@ -1,0 +1,20 @@
+/*
+Given an array nums containing n + 1 integers where each integer is between 1 and n (inclusive), 
+prove that at least one duplicate number must exist. Assume that there is only one duplicate number, 
+find the duplicate one.
+*/
+public class Solution {
+	public int findDuplicate(int[] nums) {
+		Arrays.sort(nums);// 从小到大排序
+		int lowIdx = 0, highIdx = nums.length - 1;
+		while (lowIdx < highIdx - 1) {// lowIdx和highIdx值相差1的时候就是找到重复值的时候
+			int midIdx = (lowIdx + highIdx) / 2;
+			if (midIdx - lowIdx + 1 > nums[midIdx] - nums[lowIdx] + 1) {// 重复的数字出现在左边
+				highIdx = midIdx;
+			} else {// 重复的数字出现在右边
+				lowIdx = midIdx;
+			}
+		}
+		return nums[lowIdx];
+	}
+}
