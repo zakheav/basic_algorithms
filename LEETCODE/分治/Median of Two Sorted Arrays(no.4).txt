@@ -1,3 +1,4 @@
+// 偶数情况选择中间两个数之和/2
 public class Solution {
 	public double findMedianSortedArrays(int A[], int B[]) {
 		int len = A.length + B.length;
