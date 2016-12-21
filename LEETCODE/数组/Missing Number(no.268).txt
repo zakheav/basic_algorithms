@@ -3,7 +3,7 @@ For example,
 Given nums = [3, 1, 0] return 2.
 Note:
 Your algorithm should run in linear runtime complexity. Could you implement it using only constant extra space complexity?
-
+// 解法1（适用更广泛，对于缺失多个数也可以用类似方法）
 public class Solution {
 	public int missingNumber(int[] nums) {
 		int hole = nums.length;
@@ -28,5 +28,19 @@ public class Solution {
 			}
 		}
 		return hole;// 洞的位置就是缺失的数字(没有洞的情况就是缺失了最后一个数字)
+	}
+}
+
+// 解法2
+public class Solution {
+	public int missingNumber(int[] nums) {
+		int n = nums.length;
+		// 计算0～n的和
+		int sum1 = ((0 + n) * n) >> 1;
+		int sum2 = 0;
+		for (int i = 0; i < n; ++i) {
+			sum2 += nums[i];
+		}
+		return sum1 - sum2;
 	}
 }
