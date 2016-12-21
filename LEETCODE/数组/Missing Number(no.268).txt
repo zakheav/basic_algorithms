@@ -1,0 +1,32 @@
+Given an array containing n distinct numbers taken from 0, 1, 2, ..., n, find the one that is missing from the array.
+For example,
+Given nums = [3, 1, 0] return 2.
+Note:
+Your algorithm should run in linear runtime complexity. Could you implement it using only constant extra space complexity?
+
+public class Solution {
+	public int missingNumber(int[] nums) {
+		int hole = nums.length;
+		for (int i = 0; i < nums.length; ++i) {// 把nums中的每个数n放到下标为n的位置
+			// 维护一个有序区，[0,i]区间内的数字要么等于自己的下标，要么等于-1（是洞）
+			while (nums[i] != i && nums[i] != -1) {
+				int n = nums[i];
+				if (n >= nums.length) {
+					nums[i] = -1;
+					hole = i;// 记录下“洞”的位置
+				} else {
+					if (nums[n] == -1) {// 把nums[i]放到前面的空中去
+						nums[n] = n;
+						nums[i] = -1;
+						hole = i;// 记录下“洞”的位置
+					} else {// 把nums[i]和后面的nums[n]相交换
+						int temp = nums[n];
+						nums[n] = nums[i];
+						nums[i] = temp;
+					}
+				}
+			}
+		}
+		return hole;// 洞的位置就是缺失的数字(没有洞的情况就是缺失了最后一个数字)
+	}
+}
