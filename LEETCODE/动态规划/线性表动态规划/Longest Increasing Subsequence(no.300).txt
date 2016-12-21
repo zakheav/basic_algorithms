@@ -1,0 +1,27 @@
+Given an unsorted array of integers, find the length of longest increasing subsequence.
+For example,
+Given [10, 9, 2, 5, 3, 7, 101, 18],
+The longest increasing subsequence is [2, 3, 7, 101], therefore the length is 4. 
+Note that there may be more than one LIS combination, it is only necessary for you to return the length.
+
+// 状态转移公式：dp[i]表示以nums[i]结尾的最长递增序列长度
+// dp[i] = max(dp[j] + 1)， 其中nums[j] < nums[i]，如果不存在这样的j，dp[i] = 1;
+public class Solution {
+	public int lengthOfLIS(int[] nums) {
+		if (nums.length == 0)
+			return 0;
+		dp[0] = 1;
+		for (int i = 1; i < nums.length; ++i) {
+			for (int j = 0; j < i; ++j) {
+				if (nums[j] < nums[i]) {
+					dp[i] = Math.max(dp[i], dp[j] + 1);
+				}
+			}
+		}
+		int result = 0;
+		for (int i = 0; i < nums.length; ++i) {
+			result = Math.max(result, dp[i]);
+		}
+		return result;
+	}
+}
