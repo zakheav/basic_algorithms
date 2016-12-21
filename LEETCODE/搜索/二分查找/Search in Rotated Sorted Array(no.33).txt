@@ -1,0 +1,57 @@
+Suppose a sorted array is rotated at some pivot unknown to you beforehand.
+(i.e., 0 1 2 4 5 6 7 might become 4 5 6 7 0 1 2).
+You are given a target value to search. If found in the array return its index, otherwise return -1.
+You may assume no duplicate exists in the array.
+Subscribe to see which companies asked this question
+
+public class Solution {
+	// 二分查找到分界点（分界点是比左边大也比右边大）
+	private int find_dividePoint(int[] nums) {
+		if (nums[0] <= nums[nums.length - 1]) {
+			return -1;// 说明没有发生rotate
+		} else {
+			int left = 0, right = nums.length - 1;
+			while (left <= right) {// 二分查找这里都是用<=
+				int mid = (left + right) / 2;
+				int mid_left = mid == 0 ? -99999 : nums[mid - 1];
+				int mid_right = mid == nums.length - 1 ? -99999 : nums[mid + 1];
+				if (nums[mid] > mid_left && nums[mid] > mid_right) {
+					return mid;
+				} else if (nums[mid] >= nums[0]) {
+					left = mid + 1;
+				} else {
+					right = mid - 1;
+				}
+			}
+			return -1;
+		}
+	}
+
+	private int find_num(int[] nums, int begin, int end, int target) {
+		int left = begin, right = end;
+		while (left <= right) {
+			int mid = (left + right) / 2;
+			if (nums[mid] == target) {
+				return mid;
+			} else if (nums[mid] > target) {
+				right = mid - 1;
+			} else {
+				left = mid + 1;
+			}
+		}
+		return -1;
+	}
+
+	public int search(int[] nums, int target) {
+		int dividePoint = find_dividePoint(nums);// 找到分界点
+		if (dividePoint == -1) {
+			return find_num(nums, 0, nums.length - 1, target);
+		} else {
+			if (target < nums[0]) {// target在分界点右边部分
+				return find_num(nums, dividePoint + 1, nums.length - 1, target);
+			} else {// target在分界点左边部分
+				return find_num(nums, 0, dividePoint, target);
+			}
+		}
+	}
+}
