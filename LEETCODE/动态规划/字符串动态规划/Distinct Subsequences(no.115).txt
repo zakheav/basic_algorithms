@@ -1,3 +1,6 @@
+﻿Given a string S and a string T, count the number of distinct subsequences of T in S.
+A subsequence of a string is a new string which is formed from the original string by deleting some (can be none) of the characters without disturbing the relative positions of the remaining characters. (ie, "ACE" is a subsequence of "ABCDE" while "AEC" is not).
+
 // 状态转移公式 ：dp[i][j]表示s的 0~i子串在t的0~j子串中出现的次数
 // dp[i][j] = dp[i][j-1] + dp[i-1][j-1] * 1      s(i)==s(j)
 // dp[i][j] = dp[i][j-1]                         s(i)!=s(j)

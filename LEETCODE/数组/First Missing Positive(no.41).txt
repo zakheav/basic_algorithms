@@ -1,0 +1,38 @@
+Given an unsorted integer array, find the first missing positive integer.
+For example,
+Given [1,2,0] return 3,
+and [3,4,-1,1] return 2.
+Your algorithm should run in O(n) time and uses constant space.
+// 列表中的数字可以重复
+public class Solution {
+	public int firstMissingPositive(int[] nums) {
+		for (int i = 0; i < nums.length; ++i) {// 把nums中的每个数n放到下标为n-1的位置
+			// 维护一个有序区，[0,i]区间内的数字要么等于自己的下标+1，要么等于-1（是洞）
+			while (nums[i] != i + 1 && nums[i] != -1) {
+				int n = nums[i];
+				if (n - 1 >= nums.length || n <= 0) {// 删除当前位置的数据
+					nums[i] = -1;
+				} else {
+					if (n - 1 < i) {// 把nums[i]（n）放到前面的空中去
+						nums[n - 1] = n;
+						nums[i] = -1;
+					} else if (n - 1 > i) {// 把nums[i]（n）和后面的nums[n]相交换
+						if (n == nums[n - 1]) {// 有重复的数字
+							nums[i] = -1;
+						} else {
+							int temp = nums[n - 1];
+							nums[n - 1] = n;
+							nums[i] = temp;
+						}
+					}
+				}
+			}
+		}
+		for (int i = 0; i < nums.length; ++i) {// 寻找正数的第一个hole
+			if (nums[i] == -1) {
+				return i + 1;
+			}
+		}
+		return nums.length + 1;
+	}
+}
