@@ -1,0 +1,100 @@
+class UnionFindSet {
+	private int[] parent;// 记录每个节点父节点下标
+	private int[] rank;// 记录每个节点为根的子树高度
+
+	public UnionFindSet(int num) {
+		parent = new int[num];
+		rank = new int[num];
+		for (int i = 0; i < num; ++i) {// 初始化并查集
+			parent[i] = i;
+			rank[i] = 1;
+		}
+	}
+
+	public int find(int x) {// 找到x所在集合
+		if (parent[x] == x) {
+			return x;
+		} else {
+			return find(parent[x]);
+		}
+	}
+
+	public void union(int x, int y) {// 把x，y两个元素所在集合合并
+		int xSet = find(x);
+		int ySet = find(y);
+		if (xSet == ySet) {
+			return;
+		} else {
+			if (rank[xSet] > rank[ySet]) {// x所在集合的树比较高，把y集合并到x集合中
+				parent[ySet] = xSet;
+			} else {// 把x的集合并到y的集合中
+				if (rank[xSet] == rank[ySet]) {// 两棵树高度相同
+					++rank[ySet];
+				}
+				parent[xSet] = ySet;
+			}
+		}
+	}
+}
+
+class Graph {
+	// 构造的是出度邻接表(带权图，map中的key是节点编号，value是权值)
+	public List<Map<Integer, Integer>> adjTable = new ArrayList<Map<Integer, Integer>>();
+
+	public Graph(int pointNum, int[][] pairs) {// 输入点对，边的方向是从pairs[][0]到pairs[][1]，权值是pairs[][2]
+		for (int i = 0; i < pointNum; ++i) {
+			adjTable.add(new HashMap<Integer, Integer>());
+		} // 初始化邻接表
+		for (int i = 0; i < pairs.length; ++i) {
+			adjTable.get(pairs[i][0]).put(pairs[i][1], pairs[i][2]);
+		}
+	}
+}
+
+public class Kruskal {
+	private List<Integer[]> treeEdgePairs = new ArrayList<Integer[]>();// 最小生成树的结果
+
+	class MyComparator implements Comparator<Integer[]> {
+		@Override
+		public int compare(Integer[] p1, Integer[] p2) {
+			return p1[2] - p2[2];
+		}
+	}
+
+	public void kruskal(Integer[][] pairs) {
+		List<Integer[]> graphEdgePairs = new ArrayList<Integer[]>();
+		int maxNodeNum = 0;
+		for (int i = 0; i < pairs.length; ++i) {// 存储边，并且计算最大的节点号，为初始化并查集
+			maxNodeNum = Math.max(maxNodeNum, pairs[i][0]);
+			maxNodeNum = Math.max(maxNodeNum, pairs[i][1]);
+			graphEdgePairs.add(pairs[i]);
+		}
+		Collections.sort(graphEdgePairs, new MyComparator());// 按照权重从小到大把边进行排序
+		UnionFindSet ufs = new UnionFindSet(maxNodeNum + 1);// 初始化并查集
+		for (Integer[] edge : graphEdgePairs) {
+			int node1 = edge[0];
+			int node2 = edge[1];
+			int weight = edge[2];
+			if (ufs.find(node1) != ufs.find(node2)) {
+				ufs.union(node1, node2);
+				Integer[] treeEdge = { node1, node2, weight };
+				treeEdgePairs.add(treeEdge);
+			}
+		}
+	}
+
+	public void display() {
+		for (Integer[] treeEdge : treeEdgePairs) {
+			System.out.println(treeEdge[0] + ", " + treeEdge[1] + ": " + treeEdge[2]);
+		}
+	}
+
+	public static void main(String[] args) {
+		Integer[][] pairs = { { 0, 1, 4 }, { 1, 2, 8 }, { 2, 3, 7 }, { 3, 4, 9 }, { 4, 5, 10 }, { 5, 6, 2 },
+				{ 6, 7, 1 }, { 7, 0, 8 }, { 7, 1, 11 }, { 7, 8, 7 }, { 8, 2, 2 }, { 8, 6, 6 }, { 2, 5, 4 },
+				{ 3, 5, 14 } };
+		Kruskal kruskal = new Kruskal();
+		kruskal.kruskal(pairs);// 生成最小生成树
+		kruskal.display();
+	}
+}
