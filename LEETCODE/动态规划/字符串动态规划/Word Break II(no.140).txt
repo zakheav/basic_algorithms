@@ -1,3 +1,10 @@
+Given a non-empty string s and a dictionary wordDict containing a list of non-empty words, add spaces in s to construct a sentence where each word is a valid dictionary word. You may assume the dictionary does not contain duplicate words.
+Return all such possible sentences.
+For example, given
+s = "catsanddog",
+dict = ["cat", "cats", "and", "sand", "dog"].
+A solution is ["cats and dog", "cat sand dog"].
+
 public class Solution {
 	private List<String> results = new ArrayList<String>();
 	private List<List<Integer>> dp = new ArrayList<List<Integer>>();// dp[i]存储了源字符串0~i部分最后一刀后面最近的下标的所有情况
