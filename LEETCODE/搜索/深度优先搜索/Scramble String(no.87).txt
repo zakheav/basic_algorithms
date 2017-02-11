@@ -1,0 +1,39 @@
+public class Solution {
+    private boolean sameLetter(String s1, String s2) {// 比较单词中的字母是否一样
+        char[] cArr1 = s1.toCharArray();
+        char[] cArr2 = s2.toCharArray();
+        Arrays.sort(cArr1);
+        Arrays.sort(cArr2);
+        s1 = new String(cArr1);
+        s2 = new String(cArr2);
+        return s1.equals(s2);
+    } 
+    public boolean isScramble(String s1, String s2) {
+        if(sameLetter(s1, s2)) {
+            if(s1.equals(s2)) return true;
+            
+            for(int i=0; i < s1.length()-1; ++i) {// 把s1分为s1[0,i]，s1[i+1,end]两部分
+                String s11 = s1.substring(0, i+1);
+                String s12 = s1.substring(i+1, s1.length());
+                // s2有两种划分方式：
+                String s21, s22;
+                // 划分方式1
+                s21 = s2.substring(0, s11.length());
+                s22 = s2.substring(s11.length(), s2.length());
+                if(isScramble(s11, s21) && isScramble(s12, s22)) {
+                    return true;
+                }
+                // 划分方式2
+                s21 = s2.substring(0, s12.length());
+                s22 = s2.substring(s12.length(), s2.length());
+                if(isScramble(s12, s21) && isScramble(s11, s22)) {
+                    return true;
+                }
+            }
+            
+            return false;
+        } else {
+            return false;    
+        }
+    }
+}

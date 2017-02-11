@@ -1,0 +1,45 @@
+class Element {
+	public int key;
+    public int value;
+    public Element(int key, int value) {
+    	this.key = key;
+        this.value = value;
+    }
+}
+public class LRUCache {
+    private LinkedList<Element> stack;
+    private Map<Integer, Element> cache;
+    private int capacity;
+    public LRUCache(int capacity) {
+        this.capacity = capacity;
+        this.stack = new LinkedList<Element>();
+        this.cache = new HashMap<Integer, Element>();
+    }
+    
+    public int get(int key) {
+        Element e = cache.get(key);
+        if(e != null) {
+        	stack.remove(e);
+            stack.addFirst(e);
+            return e.value;
+        } else {
+        	return -1;
+        }
+    }
+    
+    public void put(int key, int value) {
+		if (cache.containsKey(key)) {// 如果key已经存在，需要删除老的
+			Element old = cache.get(key);
+			cache.remove(key);
+			stack.remove(old);
+		}
+		if (stack.size() == capacity) {
+			Element last = stack.removeLast();
+			cache.remove(last.key);
+		} // 删除掉最不常用的元素
+
+		Element e = new Element(key, value);
+		cache.put(key, e);
+		stack.addFirst(e);
+    }
+}
