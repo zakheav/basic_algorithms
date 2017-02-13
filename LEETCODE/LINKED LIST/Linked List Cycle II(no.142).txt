@@ -1,0 +1,47 @@
+找到成环的节点(如果没有成环，返回null)
+/**
+ * Definition for singly-linked list.
+ * class ListNode {
+ *     int val;
+ *     ListNode next;
+ *     ListNode(int x) {
+ *         val = x;
+ *         next = null;
+ *     }
+ * }
+ */
+public class Solution {
+	// 当快指针和慢指针重合的时候，把一个指针重新指向头指针，两个指针现在速度一样，一次走一步，那么当两个指针值相同时，所在的指针就是我们要找的起始位置。
+    // 图：http://www.jianshu.com/p/ce7f035daf74
+    // 环的大小为L
+    // slow指针走过的路程 a+nL+b
+    // fast指针走过的路程 a+mL+b
+    // 2*(a+nL+b) = a+mL+b
+    // a+b = (m-2n)*L > 0
+    // m-2n >= 1
+    // a = (m-2n)*L - b = (m-2n-1)*L + L-b  证明完毕
+    public ListNode detectCycle(ListNode head) {
+    	if(head == null) return null;
+    	ListNode slow = head;
+    	ListNode fast = head.next;
+    	slow = slow.next;
+    	if(fast != null)
+    		fast = fast.next;
+    	else
+    		return null;// 说明没有成环
+    	while(slow != fast && fast != null) {
+    		slow = slow.next;
+    		fast = fast.next;
+    		if(fast != null)
+    			fast = fast.next;
+    	}
+    	if(fast == null)
+    		return null;
+    	slow = head;
+    	while(slow != fast) {
+    		slow = slow.next;
+    		fast = fast.next;
+    	}
+    	return slow;
+    }
+}
