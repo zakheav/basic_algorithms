@@ -1,0 +1,62 @@
+Median is the middle value in an ordered integer list. If the size of the list is even, there is no middle value. So the median is the mean of the two middle value.
+
+Examples: 
+[2,3,4] , the median is 3
+
+[2,3], the median is (2 + 3) / 2 = 2.5
+
+Design a data structure that supports the following two operations:
+
+void addNum(int num) - Add a integer number from the data stream to the data structure.
+double findMedian() - Return the median of all elements so far.
+For example:
+
+addNum(1)
+addNum(2)
+findMedian() -> 1.5
+addNum(3) 
+findMedian() -> 2
+
+// 思路：采用两个堆，最小堆存储右边的一半，最大堆存储左边的一半（包括中间的）
+public class MedianFinder {
+
+    class Cmp implements Comparator<Integer>{
+	    public int compare(Integer x, Integer y) {  
+	        return y-x;  
+	    }
+	};
+    // Adds a number into the data structure.
+    private PriorityQueue<Integer> maxHeap = new PriorityQueue<Integer>(11, new Cmp());
+    private PriorityQueue<Integer> minHeap = new PriorityQueue<Integer>();
+    // 最大堆的大小可以等于最小堆大小，或者比最小堆大小大一
+    public void addNum(int num) {
+        Integer maxInMaxHeap = maxHeap.peek();
+        Integer minInMinHeap = minHeap.peek();
+        if(maxInMaxHeap == null && minInMinHeap == null){// 第一个放到大根堆里面
+        	maxHeap.offer(num);
+        } else {
+        	if(num >= maxInMaxHeap){// 应该放到小根堆
+        		minHeap.offer(num);
+        		if(maxHeap.size() < minHeap.size()){// 平衡两个堆的大小
+        			int temp = minHeap.poll();
+        			maxHeap.offer(temp);
+        		} 
+        	} else {// 应该放到大根堆
+        		maxHeap.offer(num);
+        		if(maxHeap.size() - minHeap.size() == 2){// 平衡两个堆的大小
+        			int temp = maxHeap.poll();
+        			minHeap.offer(temp);
+        		}
+        	}
+        } 
+    }
+
+    // Returns the median of current data stream
+    public double findMedian() {
+        if(maxHeap.size() > minHeap.size()){
+        	return maxHeap.peek();
+        } else{
+        	return (maxHeap.peek() + minHeap.peek()) / 2.0;
+        }
+    }
+};
