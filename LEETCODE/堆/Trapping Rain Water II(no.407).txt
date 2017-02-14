@@ -1,0 +1,122 @@
+Given an m x n matrix of positive integers representing the height of each unit cell in a 2D elevation map, compute the volume of water it is able to trap after raining.
+
+class Cell {
+	public int height;
+	public int row;
+	public int col;
+
+	public Cell(int height, int row, int col) {
+		this.height = height;
+		this.row = row;
+		this.col = col;
+	}
+}
+
+class MinComparator implements Comparator<Cell> {
+	@Override
+	public int compare(Cell c0, Cell c1) {
+		return c0.height - c1.height;
+	}
+}
+
+public class Solution {
+	private int result;
+	private PriorityQueue<Cell> minHeap = new PriorityQueue<Cell>(100, new MinComparator());
+
+	private void bfs(Cell cell, Cell[][] cellMap) {
+		Set<Cell> buttom = new HashSet<Cell>();
+		int row = cellMap.length;
+		int col = cellMap[0].length;
+		int buttomHeight = cell.height;
+		int borderHeight = 99999;
+		Queue<Cell> queue = new LinkedList<Cell>();
+		queue.offer(cell);
+		buttom.add(cell);
+		while (!queue.isEmpty()) {
+			Cell nowCell = queue.poll();
+			int r = nowCell.row, c = nowCell.col;
+			// 上面的cell
+			if (r - 1 < 0) {
+				borderHeight = 0;
+			} else {
+				if (cellMap[r - 1][c].height == buttomHeight) {// 不是边界
+					if (!buttom.contains(cellMap[r - 1][c])) {
+						queue.offer(cellMap[r - 1][c]);
+						buttom.add(cellMap[r - 1][c]);
+					}
+				} else {// 访问到了边界
+					borderHeight = Math.min(borderHeight, cellMap[r - 1][c].height);
+				}
+			}
+			// 下面的cell
+			if (r + 1 == row) {
+				borderHeight = 0;
+			} else {
+				if (cellMap[r + 1][c].height == buttomHeight) {// 不是边界
+					if (!buttom.contains(cellMap[r + 1][c])) {
+						queue.offer(cellMap[r + 1][c]);
+						buttom.add(cellMap[r + 1][c]);
+					}
+				} else {// 访问到了边界
+					borderHeight = Math.min(borderHeight, cellMap[r + 1][c].height);
+				}
+			}
+			// 左边的cell
+			if (c - 1 < 0) {
+				borderHeight = 0;
+			} else {
+				if (cellMap[r][c - 1].height == buttomHeight) {// 不是边界
+					if (!buttom.contains(cellMap[r][c - 1])) {
+						queue.offer(cellMap[r][c - 1]);
+						buttom.add(cellMap[r][c - 1]);
+					}
+				} else {// 访问到了边界
+					borderHeight = Math.min(borderHeight, cellMap[r][c - 1].height);
+				}
+			}
+			// 右边的cell
+			if (c + 1 == col) {
+				borderHeight = 0;
+			} else {
+				if (cellMap[r][c + 1].height == buttomHeight) {// 不是边界
+					if (!buttom.contains(cellMap[r][c + 1])) {
+						queue.offer(cellMap[r][c + 1]);
+						buttom.add(cellMap[r][c + 1]);
+					}
+				} else {// 访问到了边界
+					borderHeight = Math.min(borderHeight, cellMap[r][c + 1].height);
+				}
+			}
+		}
+
+		// 处理底部的元素
+		if (borderHeight < buttomHeight) {// 不能装水的底部从最小堆中删除
+			for (Cell buttomCell : buttom) {
+				minHeap.remove(buttomCell);
+			}
+		} else {// 可以装水的底部将装水量累加到result中，同时修改最小堆中的元素
+			for (Cell buttomCell : buttom) {
+				minHeap.remove(buttomCell);
+				result += borderHeight - buttomCell.height;
+				buttomCell.height = borderHeight;
+				minHeap.offer(buttomCell);
+			}
+		}
+	}
+
+	public int trapRainWater(int[][] heightMap) {
+	    if(heightMap.length == 0) return 0;
+		Cell[][] cellMap = new Cell[heightMap.length][heightMap[0].length];
+		for (int i = 0; i < heightMap.length; ++i) {
+			for (int j = 0; j < heightMap[0].length; ++j) {
+				cellMap[i][j] = new Cell(heightMap[i][j], i, j);
+				minHeap.offer(cellMap[i][j]);
+			}
+		}
+		while(!minHeap.isEmpty()) {
+			Cell cell = minHeap.peek();
+			bfs(cell, cellMap);
+		}
+		return result;
+	}
+}
