@@ -1,0 +1,49 @@
+Implement wildcard pattern matching with support for '?' and '*'.
+
+'?' Matches any single character.
+'*' Matches any sequence of characters (including the empty sequence).
+
+The matching should cover the entire input string (not partial).
+
+The function prototype should be:
+bool isMatch(const char *s, const char *p)
+
+Some examples:
+isMatch("aa","a") → false
+isMatch("aa","aa") → true
+isMatch("aaa","aa") → false
+isMatch("aa", "*") → true
+isMatch("aa", "a*") → true
+isMatch("ab", "?*") → true
+isMatch("aab", "c*a*b") → false
+
+// 状态转移公式：dp[i+1][j+1]表示s的0~i和p的0~j是否匹配
+// p[j]=='*'			dp[i+1][j+1] = dp[i+1][j](p中的*匹配s中的空) || dp[i][j] || dp[i][j+1](p中的*匹配s[i])
+// p[j]==s[j] || p[j]=='?' 	dp[i+1][j+1] = dp[i][j]
+// 否则				dp[i+1][j+1] = false
+public class Solution {
+	
+	public boolean isMatch(String s, String p) {
+		boolean[][] dp = new boolean[s.length() + 1][p.length() + 1];
+		dp[0][0] = true;
+		for (int i = 0; i < s.length(); ++i) {// 初始化第一列
+			dp[i + 1][0] = false;
+		}
+		for (int j = 0; j < p.length(); ++j) {// 初始化第一行
+			dp[0][j + 1] = dp[0][j] && p.charAt(j) == '*';
+		}
+		for (int i = 0; i < s.length(); ++i) {
+			for (int j = 0; j < p.length(); ++j) {
+				if (p.charAt(j) == '*') {
+					dp[i + 1][j + 1] = dp[i + 1][j] || dp[i][j] || dp[i][j + 1];
+				} else if (s.charAt(i) == p.charAt(j) || p.charAt(j) == '?') {
+					dp[i + 1][j + 1] = dp[i][j];
+				} else {
+					dp[i + 1][j + 1] = false;
+				}
+			}
+		}
+
+		return dp[s.length()][p.length()];
+	}
+}
