@@ -27,7 +27,7 @@ int kmp(char* mother, char* pattern){//mother£¬pattern¶¼ÊÇ±ê×¼µÄ×Ö·û´®£¬0ÏÂ±êÎ»Ö
 	int next[200];
 	get_next(next,pattern);//²úÉúÄ£Ê½´®µÄnextÊı×é 
 	int i=1, j=1;
-	while( mother[i] <= mother[0] && j <= pattern[0] ){
+	while( i <= mother[0] && j <= pattern[0] ){
 		if( j==0 || mother[i] == pattern[j] ){//Ä£Ê½´®ºÍÄ¸´®Æ¥Åä³É¹¦»òÕß³¹µ×Ê§°Ü 
 			++j; ++i;
 		} else{
