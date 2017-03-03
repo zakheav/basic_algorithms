@@ -1,0 +1,19 @@
+public class Solution {
+    public int minPatches(int[] nums, int n) {
+        Arrays.sort(nums);// nums是原始的数列，数字从小到大排列
+        List<Long> result = new ArrayList<Long>();
+        long nextExpectNum = 1;// 表示到nums[i]为止的数可以表示的连续数字之后的下一个连续数字
+        int numsIdx = 0;
+        while(nextExpectNum <= n) {
+            int num = numsIdx >= nums.length ? Integer.MAX_VALUE : nums[numsIdx];// nums[i]处的数字
+            if(num <= nextExpectNum) {// 可以把连续数字范围扩大
+                nextExpectNum = (long)num + nextExpectNum;
+                ++numsIdx;
+            } else {// 无法把连续数字范围扩大
+                result.add(nextExpectNum);// 这样可以把连续数字范围尽可能扩大
+                nextExpectNum = nextExpectNum + nextExpectNum;
+            }
+        }
+        return result.size();
+    }
+}
