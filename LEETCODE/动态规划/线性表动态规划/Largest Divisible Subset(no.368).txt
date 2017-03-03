@@ -1,0 +1,38 @@
+// 先把nums从小到大排序
+// dp1[i]表示已nums[i]结尾的最大可整除集合，dp2[i]存储以nums[i]结尾的最大可整除集合的上一个元素的地址
+// dp1[i] = max(dp1[j] + 1) 其中nums[i] % nums[j] == 0
+// dp2[i] = 上面选出来的j
+public class Solution {
+    public List<Integer> largestDivisibleSubset(int[] nums) {
+        List<Integer> result = new ArrayList<Integer>();
+        if(nums.length == 0) return result;
+        Arrays.sort(nums);
+        int[] dp1 = new int[nums.length];
+        int[] dp2 = new int[nums.length];
+        dp1[0] = 1;
+        dp2[0] = -1;
+        int maxSetSize = 0;
+        int maxSetFinalIdx = 0;
+        for(int i = 1; i < nums.length; ++i) {
+            dp1[i] = 1;
+            dp2[i] = -1;
+            for(int j = 0; j < i; ++j) {
+                if(nums[i] % nums[j] == 0 && dp1[j] + 1 > dp1[i]) {
+                    dp1[i] = dp1[j] + 1;
+                    dp2[i] = j;
+                }
+            }
+            if(dp1[i] > maxSetSize) {
+                maxSetSize = dp1[i];
+                maxSetFinalIdx = i;
+            }
+        }
+        
+        for(int i = maxSetFinalIdx; i != -1;) {
+            result.add(nums[i]);
+            i = dp2[i];
+        }
+        Collections.sort(result);
+        return result;
+    }
+}
