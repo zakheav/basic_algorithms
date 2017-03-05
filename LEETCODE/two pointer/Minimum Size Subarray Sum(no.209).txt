@@ -25,8 +25,7 @@ public class Solution {
 				++ptr1;
 				if (sum < s) {
 					status = 0;
-				} else {
-					min = Math.min(min, ptr2 - ptr1);
+					min = Math.min(min, ptr2 - ptr1 + 1);
 				}
 			}
 		}

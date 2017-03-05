@@ -1,3 +1,5 @@
+Given a m x n grid filled with non-negative numbers, find a path from top left to bottom right which minimizes the sum of all numbers along its path.
+
 // 状态转移公式：dp[i][j]表示到达(i,j)路径上数字和的最小值
 // dp[i][j] = min(dp[i-1][j], dp[i][j-1])+grid[i][j]
 public class Solution {

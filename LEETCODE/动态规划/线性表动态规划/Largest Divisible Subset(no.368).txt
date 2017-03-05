@@ -1,3 +1,7 @@
+Given a set of distinct positive integers, find the largest subset such that every pair (Si, Sj) of elements in this subset satisfies: Si % Sj = 0 or Sj % Si = 0.
+
+If there are multiple solutions, return any subset is fine.
+
 // 先把nums从小到大排序
 // dp1[i]表示已nums[i]结尾的最大可整除集合，dp2[i]存储以nums[i]结尾的最大可整除集合的上一个元素的地址
 // dp1[i] = max(dp1[j] + 1) 其中nums[i] % nums[j] == 0
