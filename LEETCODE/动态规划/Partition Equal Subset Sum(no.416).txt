@@ -1,0 +1,42 @@
+public class Solution {
+    // 背包问题
+    // 动态规划转移公式：dp[i][j]表示考虑第i个元素的时候，背包总容量为j的时候可以装的物品的最大总重量
+    // dp[i][j] = max {
+    //      dp[i-1][j-wi] + wi  第i件物品拿了(j >= wi)
+    //      dp[i-1][j]          第i件物品没有拿
+    // }
+    public boolean canPartition(int[] nums) {
+        int sum = 0;
+        for(int i = 0; i < nums.length; ++i) {
+            sum += nums[i];            
+        }
+        if(sum % 2 == 0) {
+            int half = sum / 2;
+            int[][] dp = new int[nums.length + 1][half + 1];
+            // dp数组初始化
+            for(int j = 0; j <= half; ++j) {// 初始化第0行
+                dp[0][j] = 0;
+            }
+            for(int i = 0; i <= nums.length; ++i) {// 初始化第一列
+                dp[i][0] = 0;
+            }
+            for(int i = 1; i <= nums.length; ++i) {
+                for(int j = 1; j <= half; ++j) {
+                    int wi = nums[i-1];
+                    int max = 0;
+                    if(j >= wi) {
+                        max = dp[i - 1][j - wi] + wi;
+                    }
+                    dp[i][j] = Math.max(max, dp[i-1][j]);
+                }
+            }
+            if(dp[nums.length][half] == half) {
+                return true;
+            } else {
+                return false;
+            }
+        } else {
+            return false;
+        }
+    }
+}
