@@ -1,0 +1,8 @@
+private void div(int[] x, int y) {
+        int temp = 0;// 表示前面位的余数
+	for(int i=0 ;i < x.length; ++i) {
+		x[i] += temp * 10;
+		temp = x[i] % y;
+		x[i] = x[i] / y;
+	}
+}
