@@ -1,0 +1,48 @@
+Given a collection of intervals, find the minimum number of intervals you need to remove to make the rest of the intervals non-overlapping.
+
+Note:
+You may assume the interval's end point is always bigger than its start point.
+Intervals like [1,2] and [2,3] have borders "touching" but they don't overlap each other.
+
+/**
+ * Definition for an interval.
+ * public class Interval {
+ *     int start;
+ *     int end;
+ *     Interval() { start = 0; end = 0; }
+ *     Interval(int s, int e) { start = s; end = e; }
+ * }
+ */
+ 
+class MyComparator implements Comparator<Interval> {
+    public int compare(Interval a1, Interval a2) {// 把Interval列表按照end从小到大排序
+        return a1.end - a2.end;
+    }    
+}
+
+public class Solution {
+    // 思路：就是找到最大的可以不相互覆盖的集合
+    // 参考算法导论：贪心算法-活动选择问题
+    // 先用动态规划的思想，定义sij表示一个活动集，每个活动起始晚于活动ai的结束时间，结束早于活动aj的开始
+    // cij是sij中的一个最大可兼容的活动子集
+    // cij = max{ckj + 1}, k是sij中的某个活动的结束时刻
+    // 容易知晓，k应该选择sij中结束时刻最早的活动，这样可以去掉上面式子中的max
+    public int eraseOverlapIntervals(Interval[] intervals) {
+        if(intervals.length == 0) return 0; 
+        Arrays.sort(intervals, new MyComparator());
+        List<Interval> list = new ArrayList<Interval>();
+        list.add(intervals[0]);
+        int end = intervals[0].end;
+        for(int i = 1; i < intervals.length;) {
+            while(i < intervals.length && intervals[i].start < end) {
+                ++i;
+            }
+            if(i < intervals.length) {
+                list.add(intervals[i]);
+                end = intervals[i].end;
+            }
+        }
+        
+        return intervals.length - list.size();
+    }
+}

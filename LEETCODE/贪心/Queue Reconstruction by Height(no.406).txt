@@ -1,0 +1,38 @@
+Suppose you have a random list of people standing in a queue. Each person is described by a pair of integers (h, k), where h is the height of the person and k is the number of people in front of this person who have a height greater than or equal to h. Write an algorithm to reconstruct the queue.
+
+class peopleComparator implements Comparator<int[]> {
+	public int compare(int[] p1, int[] p2) {// 高度高的排在前面，一样高的第二位数字小的排在前面
+		if (p1[0] == p2[0]) {
+			return p1[1] - p2[1];
+		}
+		return p2[0] - p1[0];
+	}
+}
+
+public class Solution {
+	public int[][] reconstructQueue(int[][] people) {
+		List<int[]> peopleList = new ArrayList<int[]>();
+		List<int[]> result = new ArrayList<int[]>();// 结果
+		for (int i = 0; i < people.length; ++i) {
+			int[] p = new int[2];
+			p[0] = people[i][0];
+			p[1] = people[i][1];
+			peopleList.add(p);
+		}
+		Collections.sort(peopleList, new peopleComparator());
+		// 从peopleList中取出元素p，插入到result中的第p[1]位置上
+		// 由于peopleList是按照高度从大到小排序的，高度低的人插入到高度高的前面不会影响高度高的人的第二个值
+		for (int i = 0; i < peopleList.size(); ++i) {
+			int p[] = peopleList.get(i);
+			result.add(p[1], p);
+		}
+
+		int[][] r = new int[result.size()][2];
+		for (int i = 0; i < r.length; ++i) {
+			r[i][0] = result.get(i)[0];
+			r[i][1] = result.get(i)[1];
+		}
+
+		return r;
+	}
+}
