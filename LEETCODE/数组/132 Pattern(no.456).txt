@@ -1,0 +1,33 @@
+Given a sequence of n integers a1, a2, ..., an, a 132 pattern is a subsequence ai, aj, ak such that i < j < k and ai < ak < aj. Design an algorithm that takes a list of n numbers as input and checks whether there is a 132 pattern in the list.
+
+Note: n will be less than 15,000.
+
+// 思路：先重左向右遍历nums数组，得到small[i]，记录i位置左边最小的数
+// 然后从右向左遍历nums数组，得到biggestSmall[i]，记录i位置右边小于nums[i]的数字中的最大值
+// biggestSmall数组的计算方式：用treeSet
+public class Solution {
+    public boolean find132pattern(int[] nums) {
+        if(nums.length < 3) return false;
+        int[] small = new int[nums.length];
+        small[0] = nums[0];
+        for(int i = 1; i < nums.length; ++i) {
+        	small[i] = Math.min(nums[i], small[i - 1]);
+        }
+
+        int[] biggestSmall = new int[nums.length];
+        TreeSet<Integer> treeSet = new TreeSet<Integer>();
+        for(int i = nums.length - 1; i >= 0; --i) {
+            Integer n = treeSet.floor(nums[i] - 1);
+        	biggestSmall[i] = n == null ? nums[i] : n;
+        	treeSet.add(nums[i]);
+        }
+        
+        // 判断是否存在132模式
+        for(int i = 0; i < nums.length; ++i) {
+        	if(small[i] < nums[i] && biggestSmall[i] < nums[i] && biggestSmall[i] > small[i]) {
+        		return true;
+        	}
+        }
+        return false;
+    }
+}
