@@ -1,0 +1,63 @@
+A frog is crossing a river. The river is divided into x units and at each unit there may or may not exist a stone. The frog can jump on a stone, but it must not jump into the water.
+
+Given a list of stones' positions (in units) in sorted ascending order, determine if the frog is able to cross the river by landing on the last stone. Initially, the frog is on the first stone and assume the first jump must be 1 unit.
+
+If the frog's last jump was k units, then its next jump must be either k - 1, k, or k + 1 units. Note that the frog can only jump in the forward direction.
+
+Note:
+
+The number of stones is ≥ 2 and is < 1,100.
+Each stone's position will be a non-negative integer < 231.
+The first stone's position is always 0.
+Example 1:
+
+[0,1,3,5,6,8,12,17]
+
+There are a total of 8 stones.
+The first stone at the 0th unit, second stone at the 1st unit,
+third stone at the 3rd unit, and so on...
+The last stone at the 17th unit.
+
+Return true. The frog can jump to the last stone by jumping 
+1 unit to the 2nd stone, then 2 units to the 3rd stone, then 
+2 units to the 4th stone, then 3 units to the 6th stone, 
+4 units to the 7th stone, and 5 units to the 8th stone.
+Example 2:
+
+[0,1,2,3,4,8,9,11]
+
+Return false. There is no way to jump to the last stone as 
+the gap between the 5th and 6th stone is too large.
+
+
+思路：动态规划
+dp1[i] 存放i位置是否可以到达
+dp2[i] 存放的是一个集合，包含了i位置可以支持的下一次所有跳跃距离
+
+dp1[i] = dp1[j] && 从i跳到j的距离在dp2[j]中存在(j < i)；把左边式子中为true的i到j的跳跃距离加入dp2[i]中
+
+public class Solution {
+    	public boolean canCross(int[] stones) {
+		boolean[] dp1 = new boolean[stones.length];
+		List<Set<Integer>> dp2 = new ArrayList<Set<Integer>>();
+		dp1[0] = true;
+		for(int i = 0; i < dp1.length; ++i) {
+			Set<Integer> set = new HashSet<Integer>();
+			dp2.add(set);
+		}
+		dp2.get(0).add(1);// 初始化
+
+		for(int i = 1; i < dp1.length; ++i) {
+			for(int j = i - 1; j >= 0; --j) {
+				int step = stones[i] - stones[j];
+				if(dp1[j] && dp2.get(j).contains(step)) {
+					dp1[i] = true;
+					dp2.get(i).add(step);
+					dp2.get(i).add(step - 1);
+					dp2.get(i).add(step + 1);
+				}
+			}
+		}
+		return dp1[dp1.length - 1];
+	}
+}
