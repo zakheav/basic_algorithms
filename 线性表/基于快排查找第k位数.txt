@@ -1,0 +1,40 @@
+// 如果基于快排找中位数，平均时间复杂度为O(n)
+public FindK {
+	public int findK(int[] nums, int k, int low, int high) {// 查找nums数组的第k个元素(下标从0开始)
+		int pivot = nums[low];// 枢轴
+		int lowIdx = low;
+		int highIdx = high;
+		int status = 0;// 默认移动highIdx
+		while (lowIdx < highIdx) {
+			if (status == 0) {
+				if (nums[highIdx] >= pivot) {
+					--highIdx;
+				} else {
+					nums[lowIdx] = nums[highIdx];
+					status = 1;
+				}
+			} else {
+				if (nums[lowIdx] <= pivot) {
+					++lowIdx;
+				} else {
+					nums[highIdx] = nums[lowIdx];
+					status = 0;
+				}
+			}
+		}
+		nums[lowIdx] = pivot;
+
+		if (lowIdx == k) {
+			return nums[lowIdx];
+		} else if (lowIdx < k) {
+			return findK(nums, k, lowIdx + 1, high);
+		} else {
+			return findK(nums, k, low, lowIdx - 1);
+		}
+	}
+
+	public static void main(String[] args) {
+		int[] nums = { 2, 1, 4, 5, 8, 8, 34, 22 };// 1,2,4,5,8,8,22,34
+		System.out.println(new Solution().findK(nums, 7, 0, 7));
+	}
+}
