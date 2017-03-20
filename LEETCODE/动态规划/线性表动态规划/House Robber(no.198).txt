@@ -1,32 +1,22 @@
-﻿// 状态转移公式：dp1[i]表示0～i区间最大值，dp2[i] = true表示0~i区间达到最大值的时候i号住户被偷了
-// dp2[i-1] = true:  dp1[i] = max(dp1[i-1], dp1[i-2]+nums[i]); 并根据dp1[i]的选取方式更新dp2[i]
-// dp2[i-1] = false: dp1[i] = dp1[i-1]+nums[i]; dp2[i] = true;
+﻿// 状态转移公式：
+// dp1[i]记录nums[i-1]偷的情况下nums[i-1]为止所能偷得最大值，dp2[i]记录nums[i-1]不偷的情况下nums[i-1]为止所能偷得最大值
+// dp1[i] = nums[i] + dp2[i - 1]
+// dp2[i] = max(dp1[i-1], dp2[i-1])
+// 最终结果是dp1[nums.length - 1], dp2[nums.length - 1]中最大的
 public class Solution {
     public int rob(int[] nums) {
         if(nums.length == 0) return 0;
-        boolean[] dp1 = new boolean[nums.length + 1];// dp1[i]记录nums[i-1]是否偷了
-        int[] dp2 = new int[nums.length + 1];// dp2[i]记录nums[i-1]为止所能偷得最大值
+        int[] dp1 = new int[nums.length];// dp1[i]记录nums[i-1]偷的情况下nums[i-1]为止所能偷得最大值
+        int[] dp2 = new int[nums.length];// dp2[i]记录nums[i-1]不偷的情况下nums[i-1]为止所能偷得最大值
         
-        dp1[0] = false;
+        dp1[0] = nums[0];
         dp2[0] = 0;
-        dp1[1] = true;
-        dp2[1] = nums[0];
         
-        for (int i = 2; i <= nums.length; ++i) {
-            if (dp1[i - 1]) {// 之前的住家偷了
-                if (dp2[i - 2] + nums[i - 1] > dp2[i - 1]) {
-                    dp1[i] = true;
-                    dp2[i] = dp2[i - 2] + nums[i - 1];
-                } else {
-                    dp1[i] = false;
-                    dp2[i] = dp2[i - 1];
-                }
-            } else {// 之前的住家没有偷
-                dp1[i] = true;
-                dp2[i] = dp2[i - 1] + nums[i - 1];
-            }
+        for (int i = 1; i < nums.length; ++i) {
+            dp1[i] = nums[i] + dp2[i - 1];
+            dp2[i] = Math.max(dp1[i - 1], dp2[i - 1]);
         }
-        return dp2[nums.length];
+        return Math.max(dp1[nums.length - 1], dp2[nums.length - 1]);
     }
 }
 // 对于把房子数组变成一个环形（数组的首尾是相邻的）
