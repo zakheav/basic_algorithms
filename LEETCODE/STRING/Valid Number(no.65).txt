@@ -1,0 +1,54 @@
+// 构建自动机每个单元表示状态接收到信号后的跳转状态
+     status  s0  s1  s2  s3  s4  s5  s6  s7  s8  s9  s10
+signal          
+数字         s3  s3  s4  s3  s5  s5  s8  s8  s8  s11 s11
+空格         s0  s11 s11 s9  s9  s9  s11 s11 s9  s9  s11
+.            s2  s2  s11 s4  s11 s11 s11 s11 s11 s11 s11
++/-          s1  s11 s11 s11 s11 s11 s7  s11 s11 s11 s11
+#            s11 s11 s11 s10 s10 s10 s11 s11 s10 s10 s11
+e            s11 s11 s11 s6  s6  s6  s11 s11 s11 s11 s11
+其他         s11 s11 s11 s11 s11 s11 s11 s11 s11 s11 s11
+
+
+public class Solution {
+	private int[][] FSM = {
+		{3, 3, 4, 3, 5, 5, 8, 8, 8, 11, 11},
+		{0, 11, 11, 9, 9, 9, 11, 11, 9, 9, 11},
+		{2, 2, 11, 4, 11, 11, 11, 11, 11, 11, 11},
+		{1, 11, 11, 11, 11, 11, 7, 11, 11, 11, 11},
+		{11, 11, 11, 10, 10, 10, 11, 11, 10, 10, 11},
+		{11, 11, 11, 6, 6, 6, 11, 11, 11, 11, 11},
+		{11, 11, 11, 11, 11, 11, 11, 11, 11, 11, 11}
+	};
+	private int signal_to_idx(char c) {
+		if (c >= '0' && c <= '9') {
+			return 0;
+		} else if(c == ' ') {
+			return 1;
+		} else if(c == '.') {
+			return 2;
+		} else if(c == '+' || c == '-') {
+			return 3;
+		} else if(c == '#') {
+			return 4;
+		} else if(c == 'e') {
+			return 5;
+		} else {
+			return 6;
+		}
+	}
+    public boolean isNumber(String s) {
+    	int status = 0;
+        for (int i = 0; i <= s.length() && status != 11; ++i) {
+        	char c = '\0';
+        	if(i == s.length()) {
+        		c = '#';
+        	} else {
+        		c = s.charAt(i);
+        	}
+        	int idx = signal_to_idx(c);
+        	status = FSM[idx][status];
+        }
+        return status == 10;
+    }
+}
