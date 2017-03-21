@@ -1,0 +1,56 @@
+class LinkedNode {
+	public Object value;
+	public LinkedNode next;
+	public LinkedNode pre;
+
+	public LinkedNode(Object value) {
+		this.value = value;
+	}
+}
+
+class LinkedList {
+	public LinkedNode head;
+	public LinkedNode tail;
+
+	public LinkedList() {
+		head = new LinkedNode(null);
+		tail = new LinkedNode(null);// 初始化头尾节点
+		head.next = tail;
+		tail.pre = head;
+	}
+
+	public void add(LinkedNode pos, LinkedNode node) {// 把node插入pos的后面
+		node.next = pos.next;
+		pos.next = node;// 重建next指针
+		node.next.pre = node;
+		node.pre = pos;// 重建pre指针
+	}
+
+	public void delete(LinkedNode node) {// 删除node
+		node.pre.next = node.next;
+		node.next.pre = node.pre;
+	}
+
+	public boolean isEmpty() {
+		return head.next == tail;
+	}
+
+	public LinkedNode get(int idx) {// 返回idx位置的节点
+		int i = 0;
+		LinkedNode ptr;
+		for (ptr = head.next; ptr != tail && i != idx; ++i, ptr = ptr.next)
+			;
+		if (i == idx) {
+			return ptr;
+		}
+		return null;
+	}
+
+	public String toString() {
+		StringBuilder sb = new StringBuilder();
+		for (LinkedNode ptr = head.next; ptr != tail; ptr = ptr.next) {
+			sb.append(ptr.value + "->");
+		}
+		return sb.toString();
+	}
+}
