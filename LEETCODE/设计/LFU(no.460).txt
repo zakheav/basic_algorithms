@@ -1,124 +1,54 @@
+class LinkedNode {
+	public Object value;
+	public LinkedNode next;
+	public LinkedNode pre;
 
-class FreqNode {
-	public int freq;
-	public LinkedList<KVF> kvfList = new LinkedList<KVF>();
-	public FreqNode(int f) {
-		freq = f;
-	}
-
-	public FreqNode next = null;
-	public FreqNode pre = null;
-	public FreqNode(Object o) {
-		this.val = o;
+	public LinkedNode(Object value) {
+		this.value = value;
 	}
 }
 
-class FreqList {
-	public FreqNode head = null;
-	public FreqNode tail = null;
-	public void insert(FreqNode pos, FreqNode node) {// 插入到pos节点后面（pos如果是null就插入到头上）
-		if(pos == null) {// 更新头节点
-			node.next = head;
-			if(tail == null) {
-				tail = node;
-			}
-			head = node;
-		} else {
-			node.next = pos.next;
-			pos.next = node;
-			node.pre = pos;
-			if(pos == tail) {// 更新尾节点
-				tail = node;
-			} else {
-				node.next.pre = node;
-			}
-		}
+class LinkedList {
+	public LinkedNode head;
+	public LinkedNode tail;
+
+	public LinkedList() {
+		head = new LinkedNode(null);
+		tail = new LinkedNode(null);// 初始化头尾节点
+		head.next = tail;
+		tail.pre = head;
 	}
-	public void delete(FreqNode pos) {// 删除pos节点
-		if(pos == head && pos == tail) {
-			head = null;
-			tail = null;
-		} else if(pos == head) {
-			head = head.next;
-			head.pre = null;
-		} else if(pos == tail) {
-			tail = tail.pre;
-			tail.next = null;
-		} else {
-			pos.pre.next = pos.next;
-			pos.next.pre = pos.pre;
-		}
+
+	public void add(LinkedNode pos, LinkedNode node) {// 把node插入pos的后面
+		node.next = pos.next;
+		pos.next = node;// 重建next指针
+		node.next.pre = node;
+		node.pre = pos;// 重建pre指针
+	}
+
+	public void delete(LinkedNode node) {// 删除node
+		node.pre.next = node.next;
+		node.next.pre = node.pre;
+	}
+
+	public boolean isEmpty() {
+		return head.next == tail;
 	}
 }
 
-class KVF {
-	public int key;
-	public int value;
-	public int freq;
-	public KVF(int k, int v) {
-		key = k;
-		value = v;
-		freq = 1;
-	}
-}
 
 public class LFUCache {
-	private Map<Integer, KVF> kvfMap = new HashMap<Integer, KVF>();// 根据key找KVF对象
-	private Map<Integer, FreqNode> freqMap = new HashMap<Integer, FreqNode>();// 根据频率找FreqNode对象
-	private FreqList freqList = new FreqList();// Freq对象链表
-	private int cap;
-	private int size;
-
-	private void updateFreq(KVF kvf) {
-		int f = kvf.freq;
-		FreqNode freqNode = freqMap.get(f);
-		// 删除freqNode中原来的kvm
-		freqNode.kvfList.remove(kvf);
-		++kvf.f;
-		if(freqNode.next != null && freqNode.next.freq == f + 1) {// 把kvf中的f+1,并且加入后一个freqNode中
-			freqNode.next.kvfList.add(0, kvf);
-		} else {// 新建freqNode
-			FreqNode newFreqNode = new FreqNode(f + 1);
-			newFreqNode.kvfList.add(0, kvf);
-			freqList.insert(freqNode, newFreqNode);
-			freqMap.put(f + 1, newFreqNode);
-		}
-		
-		if(freqNode.kvfList.isEmpty()) {
-			freqList.delete(freqNode);
-		}
-	}
 
     public LFUCache(int capacity) {
-        cap = capacity;
-        size = 0;
+        
     }
 
     public int get(int key) {
-        if(kvfMap.containsKey(key)) {
-        	int value = kvfMap.get(key).value;
-        	updateFreq(kvfMap.get(key));
-        	return value;
-        } else {
-        	return -1;
-        }
+        
     }
     
     public void put(int key, int value) {
-        if(kvfMap.containsKey(key)) {// 这个数据key存在
-        	kvfMap.get(key).value = value;
-        	updateFreq(kvfMap.get(key));
-        } else {
-        	if(size == cap) {// 需要删除老数据
-
-        	}
-        	// 添加新数据
-        	KVF kvf = new KVF(key, value);
-        	kvfMap.put(key, kvf);
-        	if() {
-        	
-        	}
-        }
+        
     }
 }
 
