@@ -1,0 +1,113 @@
+// AC自动机组成：trie树+节点之间的jump边和fail边。
+// 每个节点tNode包括：代表字母char，子节点映射表next[]，fail边。建立完trie树后next[]中为null的域被填充为jump边。
+
+// AC自动机的建立：在根据字典dict[]建立完trie树之后，trie树分为root节点，root节点的直接子节点root_child，其余节点node，P(tNode)表示tNode节点的父节点。
+// 对于root节点，fail边为null，jump边填充为root本身。
+// 对于root_child节点，fail边为root，jump边填充方法和node节点相同。
+// 对于node节点，fail = P(node).fail.next[node.char]，jump(c) = node.fail.next[c]。
+
+// 由AC自动机的建立过程可以知道以下两个原理：
+// 1 tNode1的fail边指向tNode2，那么tNode2.char == tNode1.char 或者 tNode2是root；并且tNode2代表的字符串前缀是tNode1代表的字符串前缀的后缀。
+// 2 tNode1的jump边指向tNode3，那么p(tNode3).char == tNode1.char 或者 p(tNode3)是root；并且p(tNode3)代表的字符串前缀是tNode1代表的字符串前缀的后缀。
+
+// 使用AC自动机进行多模匹配：
+// strPtr在母串上移动，nowPtr随着strPtr在trie树上移动
+// 每次nowPtr移动到一个位置，tempPtr从nowPtr开始沿着fail边跳动，直到跳到root节点（每次到了trie树的叶子节点就记录找到了一个单词）
+
+// AC自动机多模匹配过程理解：
+// nowPtr沿着trie树的边移动就是在扩展当前候选单词的前缀，沿着jump边移动则是切换到新单词的前缀。
+// tempPtr沿着fail边移动就是在切换当前候选单词前缀的后缀，试图在字典dict[]中找到匹配的单词。
+
+class TrieNode {
+	public Map<Character, TrieNode> next = new HashMap<Character, TrieNode>();// 字母加一个终结符#
+	public String string;// 在叶子节点存放这一枝表示的字符串
+	public TrieNode fail;
+	public TrieNode() {
+		for(char c = 'a'; c <= 'z'; ++c) {
+			next.put(c, null);
+		}
+	}
+}
+
+class AC_automaton {
+	private TrieNode root = new TrieNode();
+
+	private void insertString(String string) {
+		TrieNode now = root;
+		for(int i = 0; i < string.length(); ++i) {
+			char c = string.charAt(i);
+			if(now.next.get(c) == null) {// 需要新建节点
+				now.next.put(c, new TrieNode());
+			}
+			now = now.next.get(c);
+		}
+		now.string = string;// 在叶子节点添加string，非叶子节点是null
+	}
+
+	public AC_automaton(String[] stringList) {// 初始化ac自动机
+		for(int i = 0; i < stringList.length; ++i) {// 构建Trie树
+			String string = stringList[i];
+			insertString(string);
+		}
+
+		// 通过BFS添加fail边和jump边
+		// 把树根的第一级孩子节点的fail指针全部指向树根，同时把树根的jump边指向树根
+		Queue<TrieNode> queue = new LinkedList<TrieNode>();
+		for(Character c : root.next.keySet()) {
+			if(root.next.get(c) != null) {
+				root.next.get(c).fail = root;
+				queue.offer(root.next.get(c));
+			} else {
+				root.next.put(c, root);
+			}
+		}
+		
+		while(!queue.isEmpty()) {
+			TrieNode trieNode = queue.poll();
+			for(Character c : trieNode.next.keySet()) {
+				if(trieNode.next.get(c) != null) {
+					trieNode.next.get(c).fail = trieNode.fail.next.get(c);
+					queue.offer(trieNode.next.get(c));
+				} else {
+					trieNode.next.put(c, trieNode.fail.next.get(c));
+				}
+			}
+		}
+	}
+
+	public Map<String, Integer> query(String motherString) {// 查找字典树中的每个单词在母串中出现的次数
+		Map<String, Integer> result = new HashMap<String, Integer>();
+		TrieNode now = root, temp = null;
+		for(int i = 0; i < motherString.length(); ++i) {
+			char c = motherString.charAt(i);
+			now = now.next.get(c);
+			// temp指针顺着fail边跳跃，直到跳跃到root（相当于不断切换当前匹配字符串前缀的后缀）
+			temp = now;
+			while(temp != root) {
+				if(temp.string != null) {// 找到一个字符串
+					int count = result.get(temp.string) == null ? 0 : result.get(temp.string);
+					result.put(temp.string, count + 1);
+				}
+				temp = temp.fail;
+			}
+		}
+		return result;
+	}
+}
+
+public class Test {
+	public static void main(String[] args) {
+		String[] dict = {
+				"say",
+				"she",
+				"shr",
+				"he",
+				"her"
+		};
+		String motherString = "yasherhs";
+		Map<String, Integer> r = new AC_automaton(dict).query(motherString);
+		for(String key : r.keySet()) {
+			System.out.println(key+" "+r.get(key));
+		}
+	}
+}
