@@ -1,0 +1,28 @@
+public class Solution {
+	// w[]存放每件物品的重量，v[]存放每件物品的价值，b存放总的容量
+	// dp[i][j]表示考虑第i件物品的时候，子背包容量为j的情况下的最大价值
+	// dp[i][j] = max(dp[i-1][j-w[i]*k] + v[i]*k),k>=0且w[i]*k<=j
+
+	public int complexBag(int[] w, int[] v, int b) {
+		int[][] dp = new int[w.length + 1][b+1];
+		// 初始化第一行
+		for(int j = 0; j <= b; ++j) {
+			dp[0][j] = 0;
+		}
+		// 初始化第一列
+		for(int i = 0; i <= w.length; ++i) {
+			dp[i][0] = 0;
+		}
+		for(int i = 1; i <= w.length; ++i) {
+			for(int j = 1; j <= b; ++j) {
+				int max = 0;
+				for(int k = 0; w[i-1] * k <= j; ++k) {
+					max = Math.max(dp[i-1][j-w[i-1]*k] + v[i-1]*k, max);
+				}
+				dp[i][j] = max;
+			}
+		}
+		return dp[w.length][b];	
+	}
+}
+// 如果要求把背包装满，则把dp[0][i]设为负无穷，其中i!=0
