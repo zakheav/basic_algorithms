@@ -1,0 +1,19 @@
+// 数字从0～n，每次删除奇数位的数字（数字下标从1开始），重复多次后求最后剩余的数字。
+// 思路，第一次删除的数字是对应二进制末位为0的数字。
+// 删除之后剩余数字下标会除以二，然后删除的数字又是对应二进制末位为0的数字
+// 所以最后剩余的数字是0～n中二进制末位全为1的数字
+import java.util.Scanner;
+public class Main {
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        while(scanner.hasNext()) {
+            int n = scanner.nextInt();
+            int b = 1;
+            while(b <= n) {
+                b = b << 1;
+            }
+            b = (b >> 1) - 1;
+            System.out.println(b);
+        }
+    }
+}
