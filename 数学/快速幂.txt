@@ -1,5 +1,5 @@
 public FastPower {
-	public int fastPower(int a, int b) {// a^b
+	public static int fastPower(int a, int b) {// a^b
 		int result = 1;
 		while(b > 0) {
 			int i = 1;
@@ -8,12 +8,9 @@ public FastPower {
 				i = i * 2;
 				if(i <= b)
 					temp = temp * temp;	
-			} while(i < b);
+			} while(i <= b);
 			
-			if(i == b)
-				b = b - i;
-			else 
-				b = b - i / 2;
+			b = b - i / 2;
 			result = result * temp;
 		}
 		return result;
