@@ -1,31 +1,22 @@
 public class Solution {
 	public int trap(int[] heights) {
-		Stack<Integer> descStack = new Stack<Integer>();// 单调递减的栈
-		Stack<Integer> absorbCounterStack = new Stack<Integer>();// 每个障碍其左边比自己矮的障碍数目+1
-
-		int totalWater = 0;
-		int maxHeight = 0;// 当前栈内最高的障碍高度（栈底元素的值）
+		Stack<Integer> stack = new Stack<Integer>();// 单调递减的栈
+		Stack<Integer> stack2 = new Stack<Integer>();// 存放每个元素吸收的周围元素数目（包括自己）
+		int water = 0;// 总蓄水量
+		int maxElement = 0;// stack栈中的最大元素（栈底元素）
 		for (int i = 0; i < heights.length; ++i) {
-			int height = heights[i];
-			if (descStack.isEmpty() || height <= descStack.peek()) {// 当前障碍入栈
-				descStack.push(height);
-				absorbCounterStack.push(1);
-			} else {
-				int counter = 0;// 初始化左边比当前障碍矮的障碍物数目
-				while (!descStack.isEmpty() && height > descStack.peek()) {
-					int absorbCounter = absorbCounterStack.pop();
-					int h = descStack.pop();// 比当前障碍矮的障碍出栈
-
-					counter += absorbCounter;
-					totalWater += absorbCounter * (Math.min(maxHeight, height) - h);
-				}
-				// 当前障碍物入栈
-				descStack.push(height);
-				absorbCounterStack.push(counter + 1);
+			int h = heights[i];
+			int counter = 0;// 记录当前元素吸收的左边元素数目
+			while (!stack.isEmpty() && h > stack.peek()) {// 出栈循环
+				int temp = stack.pop();
+				int width = stack2.pop();
+				water += width * (Math.min(maxElement, h) - temp);// 记录装的水
+				counter += width;
 			}
-			// 更新maxHeight
-			maxHeight = Math.max(maxHeight, height);
+			stack.push(h);
+			stack2.push(counter + 1);
+			maxElement = Math.max(maxElement, h);
 		}
-		return totalWater;
+		return water;
 	}
 }

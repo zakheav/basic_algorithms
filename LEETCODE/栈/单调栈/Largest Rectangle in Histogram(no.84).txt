@@ -1,30 +1,20 @@
-public class Solution {
+﻿public class Solution {
 	public int largestRectangleArea(int[] heights) {
-		Stack<Integer> ascStack = new Stack<Integer>();// 单调递增的栈
-		Stack<Integer> absorbCounterStack = new Stack<Integer>();// 每个矩形吸收的矩形数目（吸收周围比自己高的矩形）
-		int maxArea = 0;
+		Stack<Integer> stack = new Stack<Integer>();// 单调递增的栈
+		Stack<Integer> stack2 = new Stack<Integer>();// 记录每个矩形吸收的周围矩形数目（包括自己）
+		int max = 0;// 最终结果
 		for (int i = 0; i <= heights.length; ++i) {
-			int height = i == heights.length ? 0 : heights[i];// 相当于在heights[]末尾加一个高度为0的矩形，保证最后所有矩形出栈
-			if (ascStack.isEmpty() || height >= ascStack.peek()) {// 当前矩形入栈(注意：height>=ascStack.peek())
-				ascStack.push(height);
-				absorbCounterStack.push(1);
-			} else {
-				// 只有在出栈的时候进行maxArea更新
-				int counter = 0;// 初始化当前矩形的absorbCounter
-				while (!ascStack.isEmpty() && height < ascStack.peek()) {// (注意：height<ascStack.peek())
-					int absorbCounter = absorbCounterStack.pop();
-					int h = ascStack.pop();// 比当前矩形高的矩形出栈
-
-					counter += absorbCounter;
-					int tempArea = counter * h;// 计算以出栈的矩形为高的聚合矩形的最大面积
-					maxArea = Math.max(maxArea, tempArea);// 更新maxArea
-				}
-
-				// 当前矩形入栈
-				ascStack.push(height);
-				absorbCounterStack.push(counter + 1);
+			int h = i == heights.length ? 0 : heights[i];
+			int counter = 0;// 统计当前矩形可以吸收的矩形数目（包括自己）
+			while (!stack.isEmpty() && stack.peek() > h) {// 出栈循环
+				// 每次出栈计算以出栈矩形为高度的最大矩形
+				int temp = stack.pop();
+				counter += stack2.pop();
+				max = Math.max(max, temp * counter);
 			}
+			stack.push(h);
+			stack2.push(counter + 1);
 		}
-		return maxArea;
+		return max;
 	}
 }

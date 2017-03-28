@@ -7,32 +7,20 @@ Another example is ")()())", where the longest valid parentheses substring is "(
 // s(i) == ')' && s(dp[i-j-1]) == '(' 其中j=dp[i-1]，则dp[i] = dp[i-1] + 2 + dp[i-j-2] (有可能链接之前的括号对 比如 ()(),后一个()连接着前一个())
 public class Solution {
 	public int longestValidParentheses(String s) {
+		if (s.length() == 0)
+			return 0;
+		int max = 0;// 最终结果
 		int[] dp = new int[s.length()];
-		int max = 0;
-		for (int i = 0; i < s.length(); ++i) {
+		dp[0] = 0;// 初始化
+		for (int i = 1; i < s.length(); ++i) {
 			if (s.charAt(i) == '(') {
 				dp[i] = 0;
+			} else if (s.charAt(i) == ')' && i - dp[i - 1] - 1 >= 0 && s.charAt(i - dp[i - 1] - 1) == '(') {
+				dp[i] = dp[i - 1] + 2 + (i - dp[i - 1] - 2 >= 0 ? dp[i - dp[i - 1] - 2] : 0);
 			} else {
-				if (i > 0) {
-					int j = dp[i - 1];
-					if (i - j - 1 >= 0) {
-						if (s.charAt(i - j - 1) == '(') {
-							if (i - j - 2 >= 0) {
-								dp[i] = dp[i - 1] + 2 + dp[i - j - 2];
-							} else {
-								dp[i] = dp[i - 1] + 2;
-							}
-							max = Math.max(dp[i], max);
-						} else {
-							dp[i] = 0;
-						}
-					} else {
-						dp[i] = 0;
-					}
-				} else {
-					dp[i] = 0;
-				}
+				dp[i] = 0;
 			}
+			max = Math.max(max, dp[i]);
 		}
 		return max;
 	}
