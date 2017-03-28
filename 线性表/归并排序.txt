@@ -1,0 +1,27 @@
+public class MergeSort {
+	public static void mergeSort(int[] nums, int begin, int end) {
+		if (begin == end)
+			return;
+		int mid = (begin + end) / 2;
+		mergeSort(nums, begin, mid);
+		mergeSort(nums, mid + 1, end);
+		int[] temp = new int[end - begin + 1];
+		int i = begin, j = mid + 1, k = 0;
+		while(i <= mid && j <= end) {
+			if(nums[i] <= nums[j]) {
+				temp[k++] = nums[i++];
+			} else {
+				temp[k++] = nums[j++];
+			}
+		}
+		while(i <= mid) {
+			temp[k++] = nums[i++];
+		}
+		while(j <= end) {
+			temp[k++] = nums[j++];
+		}
+		for(i = begin, k = 0; i <= end; ++i, ++k) {
+			nums[i] = temp[k];
+		}
+	}
+}
