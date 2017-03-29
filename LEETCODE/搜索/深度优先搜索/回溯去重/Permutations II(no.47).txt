@@ -1,4 +1,4 @@
-Given a collection of numbers that might contain duplicates, return all possible unique permutations.
+﻿Given a collection of numbers that might contain duplicates, return all possible unique permutations.
 For example,
 [1,1,2] have the following unique permutations:
 [
@@ -89,65 +89,43 @@ public class Solution {
 
 方法三 使用nextPermutation函数
 public class Solution {
-	private List<List<Integer>> results = new ArrayList<List<Integer>>();
+	private void swap(int[] nums, int i, int j) {
+		int temp = nums[i];
+		nums[i] = nums[j];
+		nums[j] = temp;
+	}
 
-	public void sort(int[] nums, int begin, int end) {
-		int[] temp = new int[end - begin + 1];
-		int j = 0;
-		for (int i = begin; i <= end; ++i) {
-			temp[j] = nums[i];
-			++j;
-		}
-		Arrays.sort(temp);
-		j = 0;
-		for (int i = begin; i <= end; ++i) {
-			nums[i] = temp[j];
-			++j;
+	private void reverse(int[] nums, int begin, int end) {
+		int i = begin, j = end;
+		while (i < j) {
+			swap(nums, i++, j--);
 		}
 	}
 
-	public boolean nextPermutation(int[] nums) {
-		int i;
-		for (i = nums.length - 2; i >= 0; --i) {
-			if (nums[i] < nums[i + 1]) {// 找到变小的那个数字nums[i]
-				for (int j = nums.length - 1; j > i; --j) {
-					if (nums[j] > nums[i]) {// 找到比变小的数字大的那个数字nums[j]
-						int temp;
-						temp = nums[j];
-						nums[j] = nums[i];
-						nums[i] = temp;// nums[i]和nums[j]交换位置
-						sort(nums, i + 1, nums.length - 1);// 把i下标后面的部分升序排列
-						break;
-					}
-				}
-				break;
-			}
+	private boolean nextPermutation(int[] nums) {// 返回是否还有下一个排列
+		int i = nums.length - 2;
+		for (; i >= 0 && nums[i] >= nums[i + 1]; --i);// 从后向前找到第一个减少的元素
+		if (i == -1)
+			return false;
+		else {
+			int j = nums.length - 1;
+			for (; nums[j] <= nums[i]; --j);// 从后向前找到第一个比nums[i]大的数字，并将其与nums[i]交换
+			swap(nums, i, j);
+			reverse(nums, i + 1, nums.length - 1);// 把i位置后的数组逆序
+			return true;
 		}
-		if (i < 0) {
-			return true;// 已经到了最后
-		}
-		List<Integer> result = new ArrayList<Integer>();
-		for(int j = 0; j < nums.length; ++j) {
-			result.add(nums[j]);
-		}
-		results.add(result);
-		return false;
 	}
 
 	public List<List<Integer>> permuteUnique(int[] nums) {
-	    
-		Arrays.sort(nums);// 排序
-		
-		List<Integer> result = new ArrayList<Integer>();
-		for(int j = 0; j < nums.length; ++j) {
-			result.add(nums[j]);
-		}
-		results.add(result);// 加入第一个排列
-		
-		boolean finish = nextPermutation(nums);
-		while(!finish) {
-			finish = nextPermutation(nums);
-		}
+		List<List<Integer>> results = new ArrayList<List<Integer>>();
+		Arrays.sort(nums);
+		do {
+			List<Integer> result = new ArrayList<Integer>();
+			for (int i = 0; i < nums.length; ++i) {
+				result.add(nums[i]);
+			}
+			results.add(result);
+		} while (nextPermutation(nums));
 		return results;
 	}
 }
