@@ -1,0 +1,17 @@
+public class GCD {
+	public int gcd(int a, int b) {// 求a，b的最大公约数
+		if(a > b) {
+			int temp = a;
+			a = b;
+			b = temp;
+		}// 保证a <= b
+
+		int c = b % a;
+		while(c != 0) {
+			b = a;
+			a = c;
+			c = b % a;
+		}
+		return a;
+	}
+}

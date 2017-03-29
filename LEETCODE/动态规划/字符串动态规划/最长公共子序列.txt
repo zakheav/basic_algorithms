@@ -1,0 +1,48 @@
+public class Solution {
+	// dp[i][j]表示s1的0～i和s2的0～j的最长公共子序列长度
+	// s1[i] == s2[j]     dp[i][j] = dp[i - 1][j - 1] + 1
+	// s1[i] != s2[j]     dp[i][j] = max(dp[i - 1][j], dp[i][j - 1])
+
+	public int LCS(String s1, String s2) {// 最长公共子序列
+		int[][] dp = new int[s1.length()][s2.length()];
+		dp[0][0] = s1.charAt(0) == s2.charAt(0) ? 1 : 0;
+		for (int j = 1; j < s2.length(); ++j) {// 初始化第一行
+			dp[0][j] = s1.charAt(0) == s2.charAt(j) ? 1 : dp[0][j - 1];
+		}
+		for (int i = 1; i < s1.length(); ++i) {// 初始化第一列
+			dp[i][0] = s1.charAt(i) == s2.charAt(0) ? 1 : dp[i - 1][0];
+		}
+		for (int i = 1; i < s1.length(); ++i) {
+			for (int j = 1; j < s2.length(); ++j) {
+				if (s1.charAt(i) == s2.charAt(j)) {
+					dp[i][j] = dp[i - 1][j - 1] + 1;
+				} else {
+					dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
+				}
+			}
+		}
+		return dp[s1.length() - 1][s2.length() - 1];
+	}
+	
+	private void print(int[][] dp, String s1, String s2) {// 根据dp数组获取最长公共子序列
+		int length = dp[s1.length() - 1][s2.length() - 1];
+		char[] sub = new char[length];
+		int ptr1 = s1.length() - 1, ptr2 = s2.length() - 1, ptr = length - 1;
+		while (ptr1 >= 0 && ptr2 >= 0) {
+			if (s1.charAt(ptr1) == s2.charAt(ptr2)) {
+				sub[ptr--] = s1.charAt(ptr1);
+				--ptr1;
+				--ptr2;
+			} else {
+				if (ptr1 == 0) --ptr2;
+				else if (ptr2 == 0) --ptr1;
+				else {
+					if (dp[ptr1][ptr2 - 1] > dp[ptr1 - 1][ptr2]) --ptr2;
+					else --ptr1;
+				}
+			}
+		}
+		String substring = new String(sub);
+		System.out.println(substring);
+	}
+}
