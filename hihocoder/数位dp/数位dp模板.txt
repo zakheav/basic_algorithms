@@ -1,0 +1,34 @@
+数位dp就是求[b,e]区间中满足某个条件的数字个数
+思路，得到[0,e],[0,b-1]区间的结果，然后相减。
+
+模板：
+num[20]：这是区间的界，最长20位的数字
+dp[20][status]：这是记忆化数组，dp[i][j]表示最高i位的数字在j状态下满足条件的数目（并且i位以上的数字没有达到区间的界）
+
+int dfs(int pos, /*status变量组*/, bool limit/*pos之前的数字有没有达到区间的界*/, bool lead/*判断有无先导0，有时候有用*/) {// 记忆化搜索
+    if (pos == -1) return 1; // 递归的边界
+    if (!limit && !lead/*有些题不用*/ && dp[pos][status] != -1) return dp[pos][status]; // 读取记忆化结果
+    
+    int up = limit ? num[pos] : 9; // 根据limit判断当前位的上界是否可以达到9
+    int ans = 0;
+    for (int i = 0; i <= up; ++i) { // 枚举pos位的数字
+        if(枚举的数字满足/*status变量组的约束*/) {
+            得到/*新的status变量组*/
+	    ans += dfs(pos-1, /*新的status变量组*/, limit && i==num[pos], lead && i==0);
+	}
+    }
+    if(!limit && !lead/*有些题不用*/) { // 只存储pos位之前的数字没有达到区间的界的情况下的值
+        dp[pos][status] = ans;
+    }
+    return ans;
+}
+
+int solve(int x) {
+    把x分割成数组num[]，x是一个h位的数
+    return dfs(h-1/*从最高位开始枚举*/, /*status变量组*/, true, true);
+}
+
+int main() {
+    int b, e;
+    结果是 solve(e) - solve(b - 1);
+}

@@ -1,0 +1,55 @@
+杭州人称那些傻乎乎粘嗒嗒的人为62（音：laoer）。
+杭州交通管理局经常会扩充一些的士车牌照，新近出来一个好消息，以后上牌照，不再含有不吉利的数字了，这样一来，就可以消除个别的士司机和乘客的心理障碍，更安全地服务大众。
+不吉利的数字为所有含有4或62的号码。例如：
+62315 73418 88914
+都属于不吉利号码。但是，61152虽然含有6和2，但不是62连号，所以不属于不吉利数字之列。
+你的任务是，对于每次给出的一个牌照区间号，推断出交管局今次又要实际上给多少辆新的士车上牌照了。
+
+public class Main {
+	private static int[][] dp;
+
+	private static int dfs(int[] num, int pos, int status, boolean limit) {// status=1表示pos前面的数字是为6
+		if (pos == -1)
+			return 1;
+		if (!limit && dp[pos][status] != -1) return dp[pos][status];// 读取记忆化结果
+		int up = limit ? num[pos] : 9;
+
+		int ans = 0;
+		for (int i = 0; i <= up; ++i) {
+			if (!(status == 1 && i == 2 || i == 4)) {// 没有出现了62和4
+				int newStatus = i == 6 ? 1 : 0;
+				ans += dfs(num, pos - 1, newStatus, limit && i == up);
+			}
+		}
+		if (!limit) {
+			dp[pos][status] = ans;
+		}
+		return ans;
+	}
+
+	private static int solve(int n) {
+		String s = n + "";
+		int[] num = new int[s.length()];
+		for (int i = 0; i < s.length(); ++i) {
+			num[num.length - i - 1] = (int) (s.charAt(i) - '0');
+		}
+
+		dp = new int[num.length][2];
+		for (int i = 0; i < dp.length; ++i) {
+			dp[i][0] = -1;
+			dp[i][1] = -1;
+		}
+		return dfs(num, num.length - 1, 0, true);
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int begin = scanner.nextInt();
+		int end = scanner.nextInt();
+		while(begin != 0 || end != 0) {
+			System.out.println(solve(end) - solve(begin - 1));
+			begin = scanner.nextInt();
+			end = scanner.nextInt();
+		}
+	}
+}
