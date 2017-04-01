@@ -1,0 +1,11 @@
+public class Main {
+	public static void main(String[] args) {
+		int num = 25;
+		int counter = 0;
+		while(num != 0) {
+			num -= num&(-num);
+			++counter;
+		}
+		System.out.println(counter);
+	}
+}

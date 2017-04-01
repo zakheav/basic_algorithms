@@ -1,0 +1,62 @@
+假设 s-t这条路径为树的直径，或者称为树上的最长路
+现有结论，从任意一点u出发搜到的最远的点一定是s、t中的一点，然后在从这个最远点开始搜，就可以搜到另一个最长路的端点，即用两遍广搜就可以找出树的最长路
+证明：
+1   设u为s-t路径上的一点，结论显然成立，否则设搜到的最远点为T则 dis(u,T) >dis(u,s) 且 dis(u,T)>dis(u,t), 则最长路不是s-t了，与假设矛盾
+2   设u不为s-t路径上的点
+    首先明确，假如u走到了s-t路径上的一点，那么接下来的路径肯定都在s-t上了，而且终点为s或t，在1中已经证明过了
+    所以现在又有两种情况了：
+    1：u走到了s-t路径上的某点，假设为X，最后肯定走到某个端点，假设是t ，则路径总长度为dis(u,X)+dis(X,t)
+    2：u走到最远点的路径u-T与s-t无交点，则dis(u,T) > dis(u,X)+ dis(X,t);显然，如果这个式子成立，
+    则dis(u,T)+dis(s,X)+dis(u,X)>dis(s,X)+dis(X,t)=dis(s,t)最长路不是s-t矛盾
+
+
+
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+public class Main {
+    private static List<Set<Integer>> tree = new ArrayList<Set<Integer>>();
+    private static int d = 0;
+    private static int end;
+    private static void dfs(int now, List<Integer> path, Set<Integer> visit) {
+        path.add(now);
+        visit.add(now);
+        boolean pathEnd = true;
+        for(int child : tree.get(now)) {
+            if(!visit.contains(child)) {
+                pathEnd = false;
+                dfs(child, path, visit);
+            }            
+        }
+        if(pathEnd) {
+            if(d < path.size()) {
+                d = path.size();
+                end = now;
+            }
+        }
+        visit.remove(now);
+        path.remove(path.size() - 1);
+    }
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int num = scanner.nextInt();
+        for(int i = 0; i <= num; ++i) {
+            tree.add(new HashSet<Integer>());
+        }
+        
+        for(int i = 0; i < num - 1; ++i) {
+            int a = scanner.nextInt();
+            int b = scanner.nextInt();
+            tree.get(a).add(b);
+            tree.get(b).add(a);
+        }
+        
+        dfs(2, new ArrayList<Integer>(), new HashSet<Integer>());// 从任意一点dfs找到最远点end
+        dfs(end, new ArrayList<Integer>(), new HashSet<Integer>());// 从end开始dfs找到新的最远点，这就是树状图的直径
+        System.out.println(d - 1);
+        scanner.close();
+    }
+}
