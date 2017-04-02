@@ -1,0 +1,56 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
+class TreeNode {
+	public int no;
+	public TreeNode left;
+	public TreeNode right;
+
+	public TreeNode(int no) {
+		this.no = no;
+	}
+}
+
+public class Main {
+	private static List<Set<Integer>> adjTable = new ArrayList<Set<Integer>>();
+
+	private static void buildTree(TreeNode root, Set<Integer> visit) {
+		visit.add(root.no);// 已经访问过
+		int lor = 0;// left or right
+		for (Integer child : adjTable.get(root.no)) {
+			if (!visit.contains(child)) {
+				++lor;
+				TreeNode newNode = new TreeNode(child);
+				if (lor == 1) {// 左枝
+					root.left = newNode;
+					buildTree(root.left, visit);
+				} else {// 右枝
+					root.right = newNode;
+					buildTree(root.right, visit);
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		// 读入节点数目n，节点编号为1～n
+		int n = scanner.nextInt();
+		for (int i = 0; i <= n; ++i) {// 初始化邻接表
+			adjTable.add(new HashSet<Integer>());
+		}
+		for (int i = 1; i < n; ++i) {// 读入n-1条边，建立邻接表
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			adjTable.get(a).add(b);
+			adjTable.get(b).add(a);
+		}
+
+		TreeNode root = new TreeNode(1);// 1是树根
+		buildTree(root, new HashSet<Integer>());
+		scanner.close();
+	}
+}
