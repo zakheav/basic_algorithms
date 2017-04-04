@@ -1,0 +1,38 @@
+public class Main {
+	private static int result = 0;// 记录逆序数对数
+	private static void mergeSort(int[] nums, int begin, int end) {// 基于归并排序找逆序数
+		if(begin == end)
+			return;
+		int mid = (begin + end) / 2;
+		mergeSort(nums, begin, mid);
+		mergeSort(nums, mid+1, end);
+		// 计算左边区域的每个数字对于右边区域的逆序数
+		int[] temp = new int[end - begin + 1];
+		int rightCounter = 0;// 记录当前加入temp数组中右边数字的数目
+		int leftIdx = begin, rightIdx = mid + 1, idx = 0;
+		while(leftIdx <= mid && rightIdx <= end) {
+			if(nums[leftIdx] <= nums[rightIdx]) {// 如果这里改为<，那么相同的数字会被记为逆序数
+				result += rightCounter;
+				temp[idx++] = nums[leftIdx++];
+			} else {
+				++rightCounter;
+				temp[idx++] = nums[rightIdx++];
+			}
+		}
+		while(leftIdx <= mid) {
+			result += rightCounter;
+			temp[idx++] = nums[leftIdx++];
+		}
+		while(rightIdx <= end) {
+			temp[idx++] = nums[rightIdx++];
+		}
+		for(int i = begin; i <= end; ++i) {
+			nums[i] = temp[i - begin];
+		}
+	}
+	public static void main(String[] args) {
+		int[] nums = {1559614248, 709366232, 500801802, 128741032, 1669935692, 1993231896, 369000208, 381379206, 962247088, 237855491};
+		mergeSort(nums, 0, nums.length - 1);
+		System.out.println(result);
+	}
+}

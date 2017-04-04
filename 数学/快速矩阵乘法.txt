@@ -1,0 +1,40 @@
+public class FastMatrixProduct {
+	public int[][] matrixProduct(int[][] a, int[][] b) {
+		int[][] result = new int[a.length][b[0].length];
+		for(int i = 0; i < a.length; ++i) {
+			for(int j = 0; j < b[0].length; ++j) {
+				int result_ij = 0;
+				for(int k = 0; k < a[0].length; ++k) {
+					result_ij += a[i][k] * b[k][j];
+				}
+				result[i][j] = result_ij;
+			}
+		}
+		return result;
+	}
+	public int[][] power(int[][] a, int b) {// a¾ØÕóµÄb´Î·½
+		int[][] result = new int[a.length][a[0].length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i][i] = 1;
+		}
+		while(b > 0) {
+			int i = 1;
+			int[][] temp = a;
+			do {
+				i *= 2;
+				if(i <= b)
+					temp = matrixProduct(temp, temp);
+			} while(i <= b);
+			b = b - i / 2;
+			result = matrixProduct(result, temp);
+		}
+		return result;
+	}
+	public static void main(String[] args) {
+		FastMatrixProduct fmp = new FastMatrixProduct();
+		int[][] a = {{1,1},{0,1}};
+		int[][] r = fmp.power(a, 7);
+		System.out.println(r[0][0] + " " + r[0][1]);
+		System.out.println(r[1][0] + " " + r[1][1]);
+	}
+}

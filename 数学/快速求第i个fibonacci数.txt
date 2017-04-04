@@ -1,0 +1,49 @@
+public class FastFib {
+	private int[][] matrixProduct(int[][] a, int[][] b) {
+		int[][] result = new int[a.length][b[0].length];
+		for(int i = 0; i < a.length; ++i) {
+			for(int j = 0; j < b[0].length; ++j) {
+				int result_ij = 0;
+				for(int k = 0; k < a[0].length; ++k) {
+					result_ij += a[i][k] * b[k][j];
+				}
+				result[i][j] = result_ij;
+			}
+		}
+		return result;
+	}
+	
+	private int[][] power(int[][] a, int b) {// a矩阵的b次方
+		int[][] result = new int[a.length][a[0].length];
+		for(int i = 0; i < a.length; ++i) {
+			result[i][i] = 1;
+		}
+		while(b > 0) {
+			int i = 1;
+			int[][] temp = a;
+			do {
+				i *= 2;
+				if(i <= b)
+					temp = matrixProduct(temp, temp);
+			} while(i <= b);
+			b = b - i / 2;
+			result = matrixProduct(result, temp);
+		}
+		return result;
+	}
+	
+	public int fastFib(int n) {// 求第n个fibonacci数
+		if(n == 1 || n == 2) return 1;
+		int times = (n + 1) / 2 - 1;
+		int[][] fib_matrix = {{1,1},{1,2}};
+		int[][] begin_matrix = {{1,1}};
+		int[][] final_matrix = power(fib_matrix, times);
+		int[][] result_matrix = matrixProduct(begin_matrix, final_matrix);
+		if(n % 2 == 0) return result_matrix[0][1];
+		return result_matrix[0][0];
+	}
+	public static void main(String[] args) {
+		FastFib ff = new FastFib();
+		System.out.println(ff.fastFib(20));
+	}
+}
