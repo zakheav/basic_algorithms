@@ -1,53 +1,53 @@
+农夫FJ有一块n行m列的矩形土地， 有的土地是肥沃的，可以在这些土地上放牛（用1表示），
+有的土地不能放牛（用0表示），而且相邻的可以放牛的格子不能同时有牛，
+问FJ一共有多少种放牛的方案（一头牛都不放也是一种方案）。
+
 import java.util.Scanner;
-
 public class Main {
-
-	private static boolean judge(int cows0, int cows1, int fields) {// 上一行的牛，这一行的牛，这一行的草地
-		if ((cows0 & cows1) == 0 && ((cows1 << 1) & cows1) == 0 && (cows1 == (cows1 & fields))) {
-			return true;
-		}
-		return false;
+	private static boolean okWithMap(int now, int land) {// 和当前行的草坪分布相容
+		return (now | land) == land && ((now << 1) & now) == 0;
 	}
-
+	private static boolean okWithPreLine(int now, int pre) {// 和前面的奶牛分布相容
+		return (now & pre) == 0;
+	}
 	public static void main(String[] args) {
 		Scanner scanner = new Scanner(System.in);
 		int row = scanner.nextInt();
 		int col = scanner.nextInt();
 		int[] map = new int[row];// 每一行用二进制串表示
-		for (int i = 0; i < row; ++i) {
+		int upper = (1 << col) - 1;
+		for(int i = 0; i < row; ++i) {
 			int r = 0;
-			for (int j = 0; j < col; ++j) {
+			for(int j = 0; j < col; ++j) {
 				int e = scanner.nextInt();
-				if (e == 0)
-					r = r << 1;
-				else
-					r = (r << 1) + 1;
+				r = r << 1;
+				if(e == 1) {
+					r += e;
+				}
 			}
 			map[i] = r;
 		}
-
-		int upper = (1 << col) - 1;// 表示每一行奶牛选择的状态对应二进制串的上确界
-		int[][] dp = new int[row][1 << col];// dp[i][s]表示考虑第i行的时候，奶牛分布状态为s的情况下可以分布的种类
-
-		// 初始化第一行
-		for (int s = 0; s <= upper; ++s) {
-			if (((s << 1) & s) == 0 && s == (s & map[0])) {// 没有出现相邻的奶牛，且都在草地上
-				dp[0][s] = 1;
+		int[][] dp = new int[row][upper + 1];// dp[i][j]表示前i行摆放方式为j的情况下的总摆放方式
+		// j方式和第i行的map不相容     dp[i][j] = 0
+		// j方式和第i行的map相容         dp[i][j] = sum(dp[i-1][k])，其中k与j相容
+		for(int j = 0; j <= upper; ++j) {// 初始化第一行
+			if(okWithMap(j, map[0])) {
+				dp[0][j] = 1;
 			}
 		}
-		
-		for (int i = 1; i < row; ++i) {// 遍历行
-			for (int s = 0; s <= upper; ++s) {// 遍历当前行的可行状态
-				for (int preS = 0; preS <= upper; ++preS) {// 遍历之前行的可行状态
-					if (judge(preS, s, map[i])) {
-						dp[i][s] += dp[i - 1][preS];// 可能preS并不是真正的可行，但是由于其对应的dp为0所以不影响
+		// 开始dp
+		for(int i = 1; i < row; ++i) {
+			for(int j = 0; j <= upper; ++j) {
+				if(okWithMap(j, map[i])) {
+					for(int k = 0; k <= upper; ++k) {
+						if(okWithPreLine(j, k)) dp[i][j] += dp[i-1][k];
 					}
 				}
 			}
 		}
 		int result = 0;
-		for (int s = 0; s <= upper; ++s) {
-			result = (result + dp[row - 1][s]) % 100000000;
+		for(int j = 0; j <= upper; ++j) {
+			result = (result + dp[row - 1][j]) % 100000000;
 		}
 		System.out.println(result);
 		scanner.close();
