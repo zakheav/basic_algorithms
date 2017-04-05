@@ -1,0 +1,64 @@
+public class FordFulkerson {
+	private int[][] rGraph;
+
+	private int findAugmentPath(int begin, int end, int[] path) {// 根据bfs寻找增广路径，path[i]记录节点i在路径上的父节点
+		Queue<Integer> queue = new LinkedList<Integer>();
+		int[] capacity = new int[rGraph.length];// capacity[i]记录bfs时以i结尾的路径的容量
+		boolean[] visit = new boolean[rGraph.length];// 记录每个节点是否已经访问过
+		// 初始化起点
+		visit[begin] = true;
+		queue.offer(begin);
+		path[begin] = -1;
+		capacity[begin] = Integer.MAX_VALUE;
+		while (!queue.isEmpty()) {
+			int now = queue.poll();
+			if (now == end) {
+				return capacity[now];// 返回增广路径的容量
+			}
+			for (int j = 0; j < rGraph.length; ++j) {
+				if (rGraph[now][j] > 0 && !visit[j]) {
+					visit[j] = true;
+					queue.offer(j);
+					path[j] = now;
+					capacity[j] = Math.min(capacity[now], rGraph[now][j]);
+				}
+			}
+		}
+		return 0;
+	}
+
+	private void modifyGraph(int[] path, int begin, int end, int delta) {
+		int now = end;
+		while (now != begin) {
+			int pre = path[now];
+			rGraph[pre][now] -= delta;
+			rGraph[now][pre] += delta;
+			now = pre;
+		}
+	}
+
+	public int maxFlow(int[][] graph, int begin, int end) {// graph是邻接矩阵
+		rGraph = graph;
+		int maxFlow = 0;
+		int delta = 0;
+		int[] path;
+		while ((delta = findAugmentPath(begin, end, path = new int[graph.length])) != 0) {
+			maxFlow += delta;
+			modifyGraph(path, begin, end, delta);
+			
+		}
+		return maxFlow;
+	}
+	public static void main (String[] args) throws java.lang.Exception
+    {
+        int graph[][] =new int[][] { {0, 3, 5, 0, 0, 0},
+                                     {0, 0, 0, 1, 0, 0},
+                                     {0, 0, 0, 2, 3, 0},
+                                     {0, 0, 0, 0, 0, 4},
+                                     {0, 0, 0, 0, 0, 2},
+                                     {0, 0, 0, 0, 0, 0}
+                                   };
+        
+        System.out.println(new FordFulkerson().maxFlow(graph, 0, 5));
+    }
+}
