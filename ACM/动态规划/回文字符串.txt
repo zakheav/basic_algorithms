@@ -1,0 +1,41 @@
+描述
+给定一个字符串 S ，最少需要几次增删改操作可以把 S 变成一个回文字符串？
+
+一次操作可以在任意位置插入一个字符，或者删除任意一个字符，或者把任意一个字符修改成任意其他字符。
+
+输入
+字符串 S。S 的长度不超过100, 只包含'A'-'Z'。
+
+输出
+最少的修改次数。
+
+
+import java.util.Scanner;
+
+public class Main4 {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		String s = scanner.nextLine();
+		int[][] dp = new int[s.length()][s.length()];
+		for (int i = 0; i < s.length() - 1; ++i) {// 初始化
+			if (s.charAt(i) == s.charAt(i + 1)) {
+				dp[i][i + 1] = 0;
+			} else {
+				dp[i][i + 1] = 1;
+			}
+		}
+		for (int step = 3; step <= s.length(); ++step) {
+			for (int begin = 0; begin + step - 1 < s.length(); ++begin) {
+				int end = begin + step - 1;
+				if (s.charAt(begin) == s.charAt(end)) {
+					dp[begin][end] = dp[begin + 1][end - 1];
+				} else {
+					dp[begin][end] = Math.min(Math.min(dp[begin + 1][end], dp[begin][end - 1]), dp[begin + 1][end - 1])
+							+ 1;
+				}
+			}
+		}
+		System.out.println(dp[0][s.length() - 1]);
+		scanner.close();
+	}
+}
