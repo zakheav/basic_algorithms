@@ -1,12 +1,14 @@
 class Node {
 	public int val;
-	public int begin;
-	public int end;
+	public int begin;// 线段起始
+	public int end;// 线段结束
+	public int mid;
 
-	public Node(int b, int e, int v) {
+	public Node(int b, int e, int v, int m) {
 		begin = b;
 		end = e;
 		val = v;
+		mid = m;
 	}
 }
 
@@ -15,26 +17,24 @@ public class SegmentTree {// 用于快速求指定区间的最小值
 
 	private void build(int root, int[] nums, int begin, int end) {
 		if (begin == end) {
-			segmentTree[root] = new Node(begin, end, nums[begin]);
+			segmentTree[root] = new Node(begin, end, nums[begin], begin);
 		} else {
 			int mid = (begin + end) / 2;
 			build(root * 2, nums, begin, mid);// 构造左子树（begin, mid）
 			build(root * 2 + 1, nums, mid + 1, end);// 构造右子树（mid+1, end）
-			segmentTree[root] = new Node(begin, end,
-					Math.min(segmentTree[root * 2].val, segmentTree[root * 2 + 1].val));
+			segmentTree[root] = new Node(begin, end, Math.min(segmentTree[root * 2].val, segmentTree[root * 2 + 1].val),
+					mid);
 		}
 	}
 
 	public SegmentTree(int[] nums) {
-		int size = 1;
-		while (size <= nums.length)
-			size = size << 1;
-		segmentTree = new Node[(size << 1) + 1];
+		int size = nums.length << 2;
+		segmentTree = new Node[size];
 		build(1, nums, 0, nums.length - 1);
 	}
 
 	public int query(int root, int q_begin, int q_end) {// 查找指定区间内的最小值
-		int begin = segmentTree[root].begin, end = segmentTree[root].end;
+		int begin = segmentTree[root].begin, end = segmentTree[root].end, mid = segmentTree[root].mid;
 
 		if (q_begin == begin && q_end == end) {
 			return segmentTree[root].val;
@@ -43,31 +43,29 @@ public class SegmentTree {// 用于快速求指定区间的最小值
 		int leftIdx = root * 2;
 		int rightIdx = root * 2 + 1;
 
-		int left_end = segmentTree[leftIdx].end;
-		int right_begin = segmentTree[rightIdx].begin;
-		if (q_end <= left_end) {// 查询区域在左区
+		if (q_end <= mid) {// 查询区域在左区
 			return query(leftIdx, q_begin, q_end);
-		} else if (q_begin >= right_begin) {// 查询区域在右区
+		} else if (q_begin > mid) {// 查询区域在右区
 			return query(rightIdx, q_begin, q_end);
 		} else {// 查询区域横跨左右区域
-			return Math.min(query(leftIdx, q_begin, left_end), query(rightIdx, right_begin, q_end));
+			return Math.min(query(leftIdx, q_begin, mid), query(rightIdx, mid + 1, q_end));
 		}
 	}
 
 	public void update(int root, int idx, int num) {
 		int begin = segmentTree[root].begin, end = segmentTree[root].end;
-		segmentTree[root].val = Math.min(segmentTree[root].val, num);
-		
-		if(begin != end) {// 没有到叶子节点
+		if (begin == end) {
+			segmentTree[root].val = num;
+		} else {
 			int leftIdx = root * 2;
 			int rightIdx = root * 2 + 1;
-			int left_begin = segmentTree[leftIdx].begin, left_end = segmentTree[leftIdx].end;
-			
-			if (idx >= left_begin && idx <= left_end) {
+			int mid = segmentTree[root].mid;
+			if (idx <= mid) {
 				update(leftIdx, idx, num);
 			} else {
 				update(rightIdx, idx, num);
 			}
+			segmentTree[root].val = Math.min(segmentTree[leftIdx].val, segmentTree[rightIdx].val);
 		}
 	}
 
