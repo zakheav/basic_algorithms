@@ -2,12 +2,14 @@ class Node {
 	public int val;
 	public int begin;
 	public int end;
+	public int mid;
 	public boolean lazy;
 
-	public Node(int b, int e, int v) {
+	public Node(int b, int e, int v, int m) {
 		begin = b;
 		end = e;
 		val = v;
+		mid = m;
 		lazy = false;
 	}
 }
@@ -17,13 +19,12 @@ public class SegmentTree {// 用于快速求指定区间的和
 
 	private void build(int root, int[] nums, int begin, int end) {
 		if (begin == end) {
-			segmentTree[root] = new Node(begin, end, nums[begin]);
+			segmentTree[root] = new Node(begin, end, nums[begin], begin);
 		} else {
 			int mid = (begin + end) / 2;
 			build(root * 2, nums, begin, mid);// 构造左子树（begin, mid）
 			build(root * 2 + 1, nums, mid + 1, end);// 构造右子树（mid+1, end）
-			segmentTree[root] = new Node(begin, end, segmentTree[root * 2].val
-					+ segmentTree[root * 2 + 1].val);
+			segmentTree[root] = new Node(begin, end, segmentTree[root * 2].val + segmentTree[root * 2 + 1].val, mid);
 		}
 	}
 
@@ -37,8 +38,8 @@ public class SegmentTree {// 用于快速求指定区间的和
 
 	private void pushUp(int nodeIdx, int newVal) {// 把线段树当前节点的值更新到父节点中去
 		int parentIdx = nodeIdx / 2;
-		if(parentIdx != 0) {// 当前节点不是根节点
-			if(nodeIdx % 2 == 0) {// 当前节点是父节点的左枝
+		if (parentIdx != 0) {// 当前节点不是根节点
+			if (nodeIdx % 2 == 0) {// 当前节点是父节点的左枝
 				int rightVal = segmentTree[nodeIdx + 1].val;// 获取父节点右枝的值
 				segmentTree[parentIdx].val = newVal + rightVal;
 			} else {// 当前节点是父节点的右枝
@@ -48,11 +49,11 @@ public class SegmentTree {// 用于快速求指定区间的和
 			pushUp(parentIdx, segmentTree[parentIdx].val);
 		}
 	}
-	
+
 	private void pushDown(int nodeIdx) {// 把当前节点的值更新到子节点中去
 		segmentTree[nodeIdx].lazy = false;
 		int begin = segmentTree[nodeIdx].begin, end = segmentTree[nodeIdx].end;
-		if(begin != end) {// 没有到叶子节点
+		if (begin != end) {// 没有到叶子节点
 			int elementNum = segmentTree[nodeIdx].val / (end - begin + 1);// 每个元素的值
 			int leftIdx = nodeIdx * 2, rightIdx = nodeIdx * 2 + 1;
 			segmentTree[leftIdx].lazy = true;
@@ -61,53 +62,49 @@ public class SegmentTree {// 用于快速求指定区间的和
 			segmentTree[rightIdx].val = elementNum * (segmentTree[rightIdx].end - segmentTree[rightIdx].begin + 1);
 		}
 	}
-	
+
 	public int query(int root, int q_begin, int q_end) {// 查找指定区间内的和
-		if(segmentTree[root].lazy == true) {// 需要把当前节点的值向下更新
+		if (segmentTree[root].lazy == true) {// 需要把当前节点的值向下更新
 			pushDown(root);
 		}
 		int begin = segmentTree[root].begin, end = segmentTree[root].end;
-		if(begin == q_begin && end == q_end) {
+		if (begin == q_begin && end == q_end) {
 			return segmentTree[root].val;
 		}
 		int leftIdx = root * 2;
 		int rightIdx = root * 2 + 1;
-
-		int left_end = segmentTree[leftIdx].end;
-		int right_begin = segmentTree[rightIdx].begin;
-		if (q_end <= left_end) {// 查询区域在左区
+		int mid = segmentTree[root].mid;
+		if (q_end <= mid) {// 查询区域在左区
 			return query(leftIdx, q_begin, q_end);
-		} else if (q_begin >= right_begin) {// 查询区域在右区
+		} else if (q_begin > mid) {// 查询区域在右区
 			return query(rightIdx, q_begin, q_end);
 		} else {// 查询区域横跨左右区域
-			return query(leftIdx, q_begin, left_end) + query(rightIdx, right_begin, q_end);
+			return query(leftIdx, q_begin, mid) + query(rightIdx, mid + 1, q_end);
 		}
 	}
 
-	public void update(int root, int u_begin, int u_end, int num) {// 把数组中[u_begin, u_end]区间的数字都更新为num
-		if(segmentTree[root].lazy == true) {// 需要把当前节点的值向下更新
+	public void update(int root, int u_begin, int u_end, int num) {// 把数组中[u_begin,u_end]区间的数字都更新为num
+		if (segmentTree[root].lazy == true) {// 需要把当前节点的值向下更新
 			pushDown(root);
 		}
 		int begin = segmentTree[root].begin, end = segmentTree[root].end;
-		if(begin == u_begin && end == u_end) {
+		if (begin == u_begin && end == u_end) {
 			segmentTree[root].val = (end - begin + 1) * num;
 			segmentTree[root].lazy = true;
 			pushUp(root, segmentTree[root].val);
 		} else {
 			int leftIdx = root * 2, rightIdx = root * 2 + 1;
-			int left_end = segmentTree[leftIdx].end;
-			int right_begin = segmentTree[rightIdx].begin;
-			if(u_end <= left_end) {// 更新区间完全在左区
+			int mid = segmentTree[root].mid;
+			if (u_end <= mid) {// 更新区间完全在左区
 				update(leftIdx, u_begin, u_end, num);
-			} else if(u_begin >= right_begin) {// 更新区间完全在右区
+			} else if (u_begin > mid) {// 更新区间完全在右区
 				update(rightIdx, u_begin, u_end, num);
 			} else {// 更新区间横跨两个区
-				update(leftIdx, u_begin, left_end, num);
-				update(rightIdx, right_begin, u_end, num);
+				update(leftIdx, u_begin, mid, num);
+				update(rightIdx, mid + 1, u_end, num);
 			}
 		}
 	}
-
 	public static void main(String[] args) {
 		int[] nums = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
 		SegmentTree st = new SegmentTree(nums);
