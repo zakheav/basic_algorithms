@@ -1,0 +1,87 @@
+hihocoder: #1490 : Tree Restoration
+
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Main {
+     public static void main(String[] args) {
+           Scanner scanner = new Scanner(System. in);
+            int N = scanner.nextInt(); // 节点数目
+            int M = scanner.nextInt(); // 树的深度
+            int K = scanner.nextInt(); // 叶子的数目
+            int[] levels = new int[ M];
+            for ( int i = 0; i < M; ++ i) {
+                 levels[ i] = scanner.nextInt();
+           }
+           List<List<Integer>> temp = new ArrayList<List<Integer>>();
+            for ( int i = 0; i < M; ++ i) {
+                List<Integer> list = new ArrayList<Integer>();
+                 for ( int j = 0; j < levels[ i]; ++ j) {
+                       list.add( scanner.nextInt());
+                }
+                 temp.add( list);
+           }
+            int[][] map = new int[ N + 1][ N + 1]; // 记录叶子节点之间的距离
+
+            int[] leaves = new int[ K];
+           Set<Integer> leavesSet = new HashSet<Integer>(); // 叶子节点的集合
+
+            for ( int i = 0; i < K; ++ i) {
+                 leaves[ i] = scanner.nextInt();
+                 leavesSet.add( leaves[ i]);
+           }
+            for ( int i = 0; i < K; ++ i) {
+                 for ( int j = 0; j < K; ++ j) {
+                       map[ leaves[ i]][ leaves[ j]] = scanner.nextInt();
+                }
+           }
+
+           Map<Integer, Integer> father = new HashMap<Integer, Integer>();
+            for ( int i = M - 1; i >= 0; -- i) {
+                 for ( int j = 0; j < temp.get( i).size();) {
+                       int k = 0;
+                       int a = temp.get( i).get( j);
+                      List<Integer> brotherLeave = new ArrayList<Integer>();
+                       for ( k = j; k < temp.get( i).size(); ++ k) {
+                            int b = temp.get( i).get( k);
+                            if ( map[ a][ b] == 2 || map[ a][ b] == 0) {// 找到a叶子的兄弟叶子
+                                  leavesSet.remove( b);
+                                  brotherLeave.add( b);
+                           } else { // a叶子的兄弟叶子找完了
+                                  break;
+                           }
+                      }
+                       // 找父亲
+                       int f = 0;
+                       if ( i != 0) {
+                            for ( int l = 0; l < temp.get( i - 1).size(); ++l) {// 在上一层从左到右找第一个不是叶节点的节点
+                                  if (!leavesSet.contains( temp.get( i - 1).get( l))) {
+                                       f = temp.get( i - 1).get( l);
+                                       break;
+                                 }
+                           }
+                      }
+                       leavesSet.add( f);
+                       for ( int l = 1; l <= N; ++ l) {
+                            int t = map[ a][ l] == 0 ? 1 : map[ a][ l];
+                            map[ f][ l] = t - 1;
+                            map[ l][ f] = t - 1;
+                      } // 父亲变为叶子节点，修正map数组
+                       for ( int b : brotherLeave) {
+                            father.put( b, f);
+                      }
+                       j = k;
+                }
+           }
+            for ( int i = 1; i < N; ++ i) {
+                System. out.print( father.get( i)+ " ");
+           }
+           System. out.print( father.get( N));
+            scanner.close();
+     }
+}
