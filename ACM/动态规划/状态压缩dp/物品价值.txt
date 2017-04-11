@@ -1,0 +1,60 @@
+描述
+小Hi现在有n个物品，每个物品都有一个价值。并且这n个物品总共有m个不同的属性，每个物品都具有其中若干属性。
+
+小Ho要从中选出若干物品，满足每个属性都正好有奇数个物品拥有，且被选出的物品价值总和最大。你能帮助小Ho完成任务么？
+
+输入
+第一行一个数T(<=10)，表示数据组数。对于每一组数据：
+
+第一行两个数n，m（1<=n<=1000，m<=10）
+
+接下来每两行描述一件物品。对于每一件物品：
+
+第一行两个数v和s，表示其价值和所含属性数量(v<=100000,s<=m)
+
+第二行s个数，表示该物品拥有的属性编号(1<=编号<=m)
+
+输出
+物品价值总和的最大值。
+
+
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int T = scanner.nextInt();
+		for (int i = 0; i < T; ++i) {
+			int n = scanner.nextInt();// n个物品
+			int m = scanner.nextInt();// m个属性
+			int[] values = new int[n];
+			int[] attrsList = new int[n];// 每件物品的属性bitmap
+			for (int j = 0; j < n; ++j) {
+				values[j] = scanner.nextInt();
+				int an = scanner.nextInt();// 属性数目（attrNum）
+				int attrs = 0;// 用int的各位表示属性出现与否（出现是奇数，没出现是偶数）
+				for (int k = 0; k < an; ++k) {
+					int attr = scanner.nextInt();
+					attrs = attrs | (1 << (attr - 1));
+				}
+				attrsList[j] = attrs;
+			}
+
+			// dp过程 dp[i][j]表示考虑第i件物品的时候已有属性的奇偶分布情况是j的条件下可以达到的最大value
+			int upper = (1 << m) - 1;
+			int[][] dp = new int[n][upper + 1];
+			// 初始化dp
+			dp[0][attrsList[0]] = values[0];
+			for (int j = 1; j < n; ++j) {
+				int attrs = attrsList[j];
+				for (int k = 0; k <= upper; ++k) {
+					if (dp[j-1][k] > 0) {
+						dp[j][0^k] = Math.max(dp[j][0^k], dp[j - 1][k]);// 第j件物品不选
+						dp[j][attrs ^ k] = Math.max(dp[j][attrs ^ k], dp[j - 1][k] + values[j]);// 第j件物品选
+					}
+				}
+			}
+			System.out.println(dp[n-1][upper]);
+		}
+	}
+}

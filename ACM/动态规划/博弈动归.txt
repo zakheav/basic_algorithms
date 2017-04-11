@@ -1,0 +1,45 @@
+#1338 : A Game
+
+Little Hi and Little Ho are playing a game. There is an integer array in front of them. They take turns (Little Ho goes first) to select a number from either the beginning or the end of the array. The number will be added to the selecter's score and then be removed from the array.
+
+Given the array what is the maximum score Little Ho can get? Note that Little Hi is smart and he always uses the optimal strategy. 
+
+import java.util.Scanner;
+
+public class Main {
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();
+		int[] nums = new int[N];
+		for (int i = 0; i < N; ++i) {
+			nums[i] = scanner.nextInt();
+		}
+
+		int[] sums = new int[N];
+		sums[0] = nums[0];
+		for (int i = 1; i < N; ++i) {
+			sums[i] = sums[i - 1] + nums[i];
+		}
+		// dp[i][j]表示[i,j]区间先选者可以获得的最大值
+		// dp[i][j] = max(sum[i,j] - dp[i+1][j], sum[i,j] - dp[i][j-1])
+		int[][] dp = new int[N][N];
+		for (int i = 0; i < N; ++i) {
+			dp[i][i] = nums[i];
+		}
+		for (int step = 2; step <= N; ++step) {
+			for (int begin = 0; begin + step - 1 < N; ++begin) {
+				int end = begin + step - 1;
+				int sum = 0;
+				if (begin == 0) {
+					sum = sums[end];
+				} else {
+					sum = sums[end] - sums[begin - 1];
+				}
+				dp[begin][end] = Math.max(sum - dp[begin + 1][end], sum
+						- dp[begin][end - 1]);
+			}
+		}
+		System.out.println(dp[0][N - 1]);
+		scanner.close();
+	}
+}
