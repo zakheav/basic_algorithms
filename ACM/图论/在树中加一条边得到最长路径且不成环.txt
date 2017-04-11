@@ -1,0 +1,60 @@
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Scanner;
+import java.util.Set;
+
+public class Main {
+	public static Map<Integer, Integer> next = new HashMap<Integer, Integer>();
+	public static Map<Integer, Integer> nodePath = new HashMap<Integer, Integer>();
+	public static List<HashSet<Integer>> adjTable = new ArrayList<HashSet<Integer>>();// 构造的是出度邻接表
+
+	public static int dfs(int now) {
+		boolean end = true;
+		int l = 0;// 子树中的最长路径
+		for (int child : adjTable.get(now)) {
+			end = false;
+			int childPath = dfs(child);
+			if (childPath > l) {
+				l = childPath;
+				next.put(now, child);
+			}
+		}
+		if (end) {
+			next.put(now, -1);
+		}
+		nodePath.put(now, l + 1);// 记录以now为根的子树的最长路径
+		return l + 1;
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();
+		for (int i = 0; i <= N; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		}
+		for (int i = 1; i < N; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			adjTable.get(a).add(b);
+		}
+		dfs(1);
+		Set<Integer> path = new HashSet<Integer>();
+		for (int i = 1; i != -1; i = next.get(i)) {
+			path.add(i);
+		}
+		int max = 0;
+		for (int n : path) {
+			for (int child : adjTable.get(n)) {
+				if (!path.contains(child) && nodePath.get(child) > max) {
+					max = nodePath.get(child);
+				}
+			}
+		}
+		int result = (path.size() - 1) + (max - 1) + 1;
+		System.out.println(result);
+		scanner.close();
+	}
+}

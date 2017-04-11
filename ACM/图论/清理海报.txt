@@ -1,0 +1,122 @@
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Scanner;
+import java.util.Set;
+
+// 思路，海报之间的遮挡关系看成有向无环图，然后dfs
+public class Main {
+	private static boolean intersect(int[][] posters, int i, int j) {
+		int xi_left = Math.min(posters[i][0], posters[i][2]);
+		int xi_right = Math.max(posters[i][0], posters[i][2]);
+		int xj_left = Math.min(posters[j][0], posters[j][2]);
+		int xj_right = Math.max(posters[j][0], posters[j][2]);
+		int yi_up = Math.max(posters[i][1], posters[i][3]);
+		int yi_down = Math.min(posters[i][1], posters[i][3]);
+		int yj_up = Math.max(posters[j][1], posters[j][3]);
+		int yj_down = Math.min(posters[j][1], posters[j][3]);
+		if (xi_left >= xj_right || xi_right <= xj_left || yi_up <= yj_down
+				|| yi_down >= yj_up) {
+			return false;
+		}
+		return true;
+	}
+
+	private static boolean between(int a, int b, int c) {// a是否在b，c之间
+		if (a >= b && a <= c || a <= b && a >= c) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	private static void intersectPoint(int[] pointBitMap, int[][] posters,
+			int i, int j) {// i海报被j海报遮蔽的角
+		int pi1x = posters[i][0], pi1y = posters[i][1];
+		int pi2x = posters[i][2], pi2y = pi1y;
+		int pi3x = posters[i][2], pi3y = posters[i][3];
+		int pi4x = pi1x, pi4y = pi3y;
+		if (between(pi1x, posters[j][0], posters[j][2])
+				&& between(pi1y, posters[j][1], posters[j][3])) {
+			pointBitMap[i] = pointBitMap[i] | 1;
+		}
+		if (between(pi2x, posters[j][0], posters[j][2])
+				&& between(pi2y, posters[j][1], posters[j][3])) {
+			pointBitMap[i] = pointBitMap[i] | 2;
+		}
+		if (between(pi3x, posters[j][0], posters[j][2])
+				&& between(pi3y, posters[j][1], posters[j][3])) {
+			pointBitMap[i] = pointBitMap[i] | 4;
+		}
+		if (between(pi4x, posters[j][0], posters[j][2])
+				&& between(pi4y, posters[j][1], posters[j][3])) {
+			pointBitMap[i] = pointBitMap[i] | 8;
+		}
+	}
+
+	private static int dfs(int[] nums, int now, Set<Integer> roots,
+			boolean[] visited) {
+		visited[now] = true;
+		roots.remove(now);
+		int counter = 1;
+		for (int child : adjTable.get(now)) {
+			if (!visited[child]) {
+				counter += dfs(nums, child, roots, visited);
+			}
+		}
+		nums[now] = counter;
+		return counter;
+	}
+
+	private static List<Set<Integer>> adjTable = new ArrayList<Set<Integer>>();
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int W = scanner.nextInt();// 黑板的宽度
+		int H = scanner.nextInt();// 黑板的高度
+		int N = scanner.nextInt();// 海报数量
+		int[][] posters = new int[N][4];
+		for (int i = 0; i < N; ++i) {
+			posters[i][0] = scanner.nextInt();
+			posters[i][1] = scanner.nextInt();
+			posters[i][2] = scanner.nextInt();
+			posters[i][3] = scanner.nextInt();
+		}
+
+		Set<Integer> roots = new HashSet<Integer>();// 记录没有访问过的节点
+		int[] nums = new int[N];// 记录每个海报可以粘连下来的海报数目(包括自己)
+		int[] pointBitMap = new int[N];// 记录每个海报被遮住的角
+		for (int i = 0; i < N; ++i) {
+			adjTable.add(new HashSet<Integer>());
+		}
+		for (int i = 0; i < N - 1; ++i) {
+			for (int j = i + 1; j < N; ++j) {
+				if (intersect(posters, i, j)) {
+					adjTable.get(i).add(j);
+					intersectPoint(pointBitMap, posters, i, j);// 记录i海报被j海报遮住了哪些角
+				}
+			}
+		}
+		// 把存在有一个角没被遮住的海报作为潜在dfs根节点
+		for (int i = 0; i < N; ++i) {
+			if (pointBitMap[i] != 15) {
+				roots.add(i);
+			}
+		}
+
+		while (!roots.isEmpty()) {
+			int root = (Integer) roots.toArray()[0];
+			dfs(nums, root, roots, new boolean[N]);
+		}
+
+		int max = 0, result = 0;
+		for (int i = 0; i < N; ++i) {
+			if (nums[i] > max) {
+				max = nums[i];
+				result = i + 1;
+			}
+		}
+		System.out.println(max + " " + result);
+		scanner.close();
+	}
+}
