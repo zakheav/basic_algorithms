@@ -1,0 +1,59 @@
+描述
+给定一个包含 N 个顶点 M 条边的无向图 G ，判断 G 是不是一棵树。
+
+输入
+第一个是一个整数 T ，代表测试数据的组数。 (1 ≤ T ≤ 10)
+
+每组测试数据第一行包含两个整数 N 和 M 。(2 ≤ N ≤ 500, 1 ≤ M ≤ 100000)
+
+以下 M 行每行包含两个整数 a 和 b ，表示顶点 a 和顶点 b 之间有一条边。(1 ≤ a, b ≤ N)
+
+输出
+对于每组数据，输出YES或者NO表示 G 是否是一棵树。
+
+
+import java.util.Scanner;
+public class Main {
+    public static boolean dfs(int[][] graph, int root, int pre, boolean[] visited) {
+        boolean isTree = true;
+        visited[root] = true;
+        for(int i = 1; i < graph.length && isTree; ++i) {
+            if(graph[root][i] == 1) {
+                if(!visited[i]) {
+                    isTree = dfs(graph, i, root, visited) && isTree;
+                } else {
+                    if(i != pre) {
+                        isTree = false;
+                    }
+                }
+            }
+        }
+        return isTree;
+    }
+    
+    public static void main(String[] args) {
+        Scanner scanner = new Scanner(System.in);
+        int T = scanner.nextInt();
+        for(int i = 0; i < T; ++i) {
+            int N = scanner.nextInt();
+            int M = scanner.nextInt();
+            int[][] graph = new int[N+1][N+1];
+            for(int j = 0; j < M; ++j) {
+                int a = scanner.nextInt();
+                int b = scanner.nextInt();
+                graph[a][b] = 1;
+                graph[b][a] = 1;
+            }
+            boolean[] visited = new boolean[N+1];
+            boolean result = dfs(graph, 1, 0, visited);
+            for(int j = 1; j <= N; ++j) {
+                result = result && visited[j];
+            }
+            if(result == true) {
+                System.out.println("YES");
+            } else {
+                System.out.println("NO");
+            }
+        }
+    }
+}
