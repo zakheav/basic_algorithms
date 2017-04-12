@@ -1,0 +1,55 @@
+#1055 : 刷油漆
+
+import java.util.*;
+
+public class Main {
+	private static int M;
+	private static int N;
+	private static int[][] tree;
+	private static int[] values;
+	private static int[][] dp;// dp[i][j]表示i节点子树拥有j个节点的情况下得到的最大值
+	private static void inverseTraversal(int root, boolean[] visited) {
+		visited[root] = true;
+		List<Integer> childList = new ArrayList<Integer>();
+		for(int child = 1; child <= N; ++child) {
+			if(!visited[child] && tree[root][child] == 1) {
+				childList.add(child);
+				inverseTraversal(child, visited);
+			}
+		}
+		
+		// 采用完全背包问题求解
+		int[][] dp2 = new int[childList.size() + 1][M];// dp2[i][j]表示考虑i件物品的时候，背包总容量为j的情况得到的最大值
+		for(int j = 0; j < M; ++j) {// 考虑背包大小
+			for(int i = 1; i <= childList.size(); ++i) {// 考虑i号物品
+				int child = childList.get(i-1);
+				int max = 0;
+				for(int k = 0; k <= j; ++k) {
+					max = Math.max(max, dp2[i-1][j - k] + dp[child][k]);
+				}
+				dp2[i][j] = max;
+			}
+			dp[root][j+1] = dp2[childList.size()][j] + values[root];
+		}
+	}
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		N = scanner.nextInt();
+		M = scanner.nextInt();
+		tree = new int[N+1][N+1];
+		values = new int[N+1];
+		dp = new int[N+1][M+1];
+		for(int i = 1; i <= N; ++i) {
+			values[i] = scanner.nextInt();
+		}
+		for(int i = 1; i < N; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			tree[a][b] = 1;
+			tree[b][a] = 1;
+		}
+		inverseTraversal(1, new boolean[N+1]);
+		System.out.println(dp[1][M]);
+		scanner.close();
+	}
+}
