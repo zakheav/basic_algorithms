@@ -45,14 +45,14 @@ public class Main {
 				if (i != j)
 					adjTable[i][j] = Integer.MAX_VALUE;
 			}
-		}
+		}// 初始化图，自己到自己距离是0，其余是正无穷
 		for (int i = 0; i < M; ++i) {
 			int a = scanner.nextInt();
 			int b = scanner.nextInt();
 			int w = scanner.nextInt();
 			adjTable[a][b] = Math.min(w, adjTable[a][b]);
 			adjTable[b][a] = Math.min(w, adjTable[b][a]);
-		}
+		}// 读入图
 		System.out.println(dijkstra(adjTable, S, T, N));
 		scanner.close();
 	}

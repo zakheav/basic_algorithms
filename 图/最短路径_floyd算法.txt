@@ -1,0 +1,42 @@
+import java.util.*;
+
+public class Main {
+	public static void floyd(int[][] graph, int N) {
+		for (int k = 1; k <= N; ++k) {// 每次依次允许i~j之间的最短路径经过1号，2号....N号节点
+			for (int i = 1; i <= N; ++i) {
+				for (int j = 1; j <= N; ++j) {
+					if (graph[i][k] < Integer.MAX_VALUE && graph[k][j] < Integer.MAX_VALUE)
+						graph[i][j] = Math.min(graph[i][j], graph[i][k] + graph[k][j]);
+				}
+			}
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();// 顶点数
+		int M = scanner.nextInt();// 边数
+		int[][] adjTable = new int[N + 1][N + 1];
+		for (int i = 0; i <= N; ++i) {// 初始化邻接矩阵
+			for (int j = 0; j <= N; ++j) {
+				if (i != j)
+					adjTable[i][j] = Integer.MAX_VALUE;
+			}
+		} // 初始化图，自己到自己距离是0，其余地点距离是正无穷
+		for (int i = 0; i < M; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			int w = scanner.nextInt();
+			adjTable[a][b] = Math.min(w, adjTable[a][b]);
+			adjTable[b][a] = Math.min(w, adjTable[b][a]);
+		} // 读入图
+		floyd(adjTable, N);
+		for (int i = 1; i <= N; ++i) {
+			for (int j = 1; j <= N; ++j) {
+				System.out.print(adjTable[i][j] + " ");
+			}
+			System.out.println();
+		}
+		scanner.close();
+	}
+}
