@@ -1,0 +1,57 @@
+import java.util.*;
+
+public class Main {
+	private static void dfs(List<List<Integer>> graph, int t, boolean[] visited) {// 统计可以访问的点的数量
+		visited[t] = true;
+		for (int i = 0; i < graph.get(t).size(); ++i) {
+			if (!visited[graph.get(t).get(i)]) {
+				dfs(graph, graph.get(t).get(i), visited);
+			}
+		}
+	}
+
+	private static boolean judge(List<List<Integer>> graph, int N) {
+		boolean[] visited = new boolean[N + 1];
+		dfs(graph, 1, visited);
+		for (int i = 1; i <= N; ++i) {
+			if (!visited[i]) {
+				return false;
+			}
+		} // 检查连通性
+		int num = 0;// 统计度数为奇数的节点数目
+		for (int i = 1; i <= N; ++i) {
+			if ((graph.get(i).size() & 1) == 1) {
+				++num;
+			}
+		}
+		if (num == 2 || num == 0) {
+			return true;
+		} else {
+			return false;
+		}
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();// 顶点数
+		int M = scanner.nextInt();// 边数
+		List<List<Integer>> adjTable = new ArrayList<List<Integer>>();
+		for (int i = 0; i <= N; ++i) {
+			adjTable.add(new ArrayList<Integer>());
+		}
+		for (int i = 0; i < M; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			adjTable.get(a).add(b);
+			adjTable.get(b).add(a);
+		}
+
+		if (judge(adjTable, N)) {
+			System.out.println("Full");
+		} else {
+			System.out.println("Part");
+		}
+
+		scanner.close();
+	}
+}
