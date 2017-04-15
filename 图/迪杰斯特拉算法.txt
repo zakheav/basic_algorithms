@@ -1,0 +1,59 @@
+import java.util.*;
+public class Main {
+	private static int findMinPath(int[] pathLength, boolean[] finished, int N) {
+		int min = Integer.MAX_VALUE;
+		int choosen = 0;
+		for (int i = 1; i <= N; ++i) {
+			if (!finished[i] && pathLength[i] < min) {
+				min = pathLength[i];
+				choosen = i;
+			}
+		}
+		finished[choosen] = true;
+		return choosen;
+	}
+
+	public static int dijkstra(int[][] graph, int begin, int end, int N) {
+		int[] pathLength = new int[N + 1];// pathLength[i]记录begin到i点的距离
+		boolean[] finished = new boolean[N + 1];// finished[i]记录begin到i的距离是否已经确定
+		for (int i = 1; i <= N; ++i) {
+			pathLength[i] = graph[begin][i];
+		}
+		finished[begin] = true;
+		int v = findMinPath(pathLength, finished, N);
+		while (v != end) {
+			// 修改pathLength中剩余的路径
+			for (int i = 1; i <= N; ++i) {
+				if (!finished[i] && graph[v][i] < Integer.MAX_VALUE) {
+					pathLength[i] = Math.min(pathLength[i], pathLength[v] + graph[v][i]);
+				}
+			}
+			v = findMinPath(pathLength, finished, N);
+		}
+		return (int) pathLength[v];
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();// 顶点数
+		int M = scanner.nextInt();// 边数
+		int S = scanner.nextInt();// 起点
+		int T = scanner.nextInt();// 终点
+		int[][] adjTable = new int[N + 1][N + 1];
+		for (int i = 0; i <= N; ++i) {// 初始化邻接矩阵
+			for (int j = 0; j <= N; ++j) {
+				if (i != j)
+					adjTable[i][j] = Integer.MAX_VALUE;
+			}
+		}
+		for (int i = 0; i < M; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			int w = scanner.nextInt();
+			adjTable[a][b] = Math.min(w, adjTable[a][b]);
+			adjTable[b][a] = Math.min(w, adjTable[b][a]);
+		}
+		System.out.println(dijkstra(adjTable, S, T, N));
+		scanner.close();
+	}
+}
