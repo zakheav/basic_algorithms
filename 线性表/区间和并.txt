@@ -1,0 +1,46 @@
+class PairComparator implements Comparator<Integer[]> {// 按照区间的起始排序
+	@Override
+	public int compare(Integer[] p1, Integer[] p2) {
+		return p1[0] - p2[0];
+	}
+}
+
+public class Main {
+
+	public static List<Integer[]> pairListMerge(List<Integer[]> pairList) {
+		Collections.sort(pairList, new PairComparator());
+		List<Integer[]> result = new ArrayList<Integer[]>();
+		int lastBegin = pairList.get(0)[0];
+		int lastEnd = pairList.get(0)[1];
+		for (int i = 1; i < pairList.size(); ++i) {
+			int begin = pairList.get(i)[0];
+			int end = pairList.get(i)[1];
+			if (begin > lastEnd) {
+				Integer[] pair = { lastBegin, lastEnd };
+				result.add(pair);
+				lastBegin = begin;
+				lastEnd = end;
+			} else {
+				lastEnd = Math.max(end, lastEnd);
+			}
+		}
+		result.add(new Integer[] { lastBegin, lastEnd });
+		return result;
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();
+		List<Integer[]> pairList = new ArrayList<Integer[]>();
+		for (int i = 0; i < N; ++i) {
+			int begin = scanner.nextInt();
+			int end = scanner.nextInt();
+			pairList.add(new Integer[] { begin, end });
+		}
+		pairList = pairListMerge(pairList);
+		for (int i = 0; i < pairList.size(); ++i) {
+			System.out.println(pairList.get(i)[0] + " " + pairList.get(i)[1]);
+		}
+		scanner.close();
+	}
+}
