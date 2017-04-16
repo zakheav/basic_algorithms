@@ -1,0 +1,47 @@
+import java.util.*;
+
+public class Main {
+	// 基于深度优先搜索寻找欧拉路径
+	public static void findEulerPath(List<List<Integer>> graph, int u, boolean[][] noVisited) {
+		for (int i = 0; i < graph.get(u).size(); ++i) {
+			int v = graph.get(u).get(i);
+			if (noVisited[u][v]) {// 如果uv边没有被选择
+				noVisited[u][v] = false;
+				noVisited[v][u] = false;// 选择边
+				findEulerPath(graph, v, noVisited);
+			}
+		}
+		System.out.print(u + " ");
+	}
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int N = scanner.nextInt();// 顶点数
+		int M = scanner.nextInt();// 边数
+		List<List<Integer>> graph = new ArrayList<List<Integer>>();
+		for (int i = 0; i <= N; ++i) {
+			graph.add(new ArrayList<Integer>());
+		}
+
+		boolean[][] noVisited = new boolean[N + 1][N + 1];
+		for (int i = 0; i < M; ++i) {
+			int a = scanner.nextInt();
+			int b = scanner.nextInt();
+			graph.get(a).add(b);
+			graph.get(b).add(a);
+			noVisited[a][b] = true;
+			noVisited[b][a] = true;
+		}
+		int begin = 1;
+		// 找到路径起点
+		for (int i = 1; i <= N; ++i) {
+			int degree = graph.get(i).size();
+			if (degree % 2 == 1) {
+				begin = i;
+				break;
+			}
+		}
+		findEulerPath(graph, begin, noVisited);
+		scanner.close();
+	}
+}
