@@ -1,4 +1,4 @@
-对链表进行排序，nlogn的时间复杂度，常数空间复杂度
+﻿对链表进行排序，nlogn的时间复杂度，常数空间复杂度
 /**
  * Definition for singly-linked list.
  * public class ListNode {
@@ -8,66 +8,58 @@
  * }
  */
 public class Solution {
-	private ListNode find_mid_node(ListNode head) {
-		ListNode fast = head.next;
-		ListNode slow = head;
-		while(fast != null && fast.next != null) {
-			slow = slow.next;
-			fast = fast.next;
-			if(fast != null) {
-				fast = fast.next;
-			}
-		}
-		return slow;
-	}
-
-	private ListNode mergeSort(ListNode head) {
-		if(head.next == null) {
-			return head;
-		} else {
-			// 链表分割成两部分left, right
-			ListNode mid = find_mid_node(head);
-			ListNode leftPart = head;
-			ListNode rightPart = mid.next;
-			mid.next = null;
-			ListNode a = mergeSort(leftPart);// 归并左边
-			ListNode b = mergeSort(rightPart);// 归并右边
-			
-			// 进行归并
-			ListNode newHead = a.val < b.val ? a : b;
-			ListNode now = null;
-			int status = -1;// 表示当前now指针在哪条链表上 -1(不确定)，0(a链表)，1(b链表)
-			while(a != null && b != null) {
-				if(a.val < b.val) {
-					if(status == 1) {// now之前在b链表上
-						now.next = a;
-					} 
-					now = a;
-					status = 0;
-					a = a.next;
-				} else {
-					if(status == 0) {// now之前在a链表上
-						now.next = b;
-					}
-					now = b;
-					status = 1;
-					b = b.next;
-				}
-			}
-			if(a == null) {
-				now.next = b;
-			} else {
-				now.next = a;
-			}
-			
-			return newHead;
-		}
-	}
-
-    // 采用归并排序
-    public ListNode sortList(ListNode head) {
-        if(head == null)
+    public ListNode findMid(ListNode head) {
+        ListNode slow = head;
+        ListNode fast = head.next;
+        while(fast != null && fast.next != null) {
+            slow = slow.next;
+            fast = fast.next;
+            if(fast != null) {
+                fast = fast.next;
+            }
+        }
+        return slow;
+    }
+    
+    public ListNode sortList(ListNode head) {// 归并排序
+        if(head == null || head.next == null) {
             return head;
-        return mergeSort(head);
+        }
+        ListNode mid = findMid(head);// 找到中点
+        ListNode left = head;
+        ListNode right = mid.next;
+        mid.next = null;
+        left = sortList(left);// 排序左边
+        right = sortList(right);// 排序右边
+        ListNode resultHead = null;
+        ListNode now = null;
+        while(left != null && right != null) {
+            if(left.val < right.val) {
+                if(resultHead == null) {
+                    resultHead = left;
+                    now = left;
+                } else {
+                    now.next = left;
+                    now = now.next;
+                }
+                left = left.next;
+            } else {
+                if(resultHead == null) {
+                    resultHead = right;
+                    now = right;
+                } else {
+                    now.next = right;
+                    now = now.next;
+                }
+                right = right.next;
+            }
+        }
+        if(left != null) {
+            now.next = left;
+        }
+        if(right != null) {
+            now.next = right;
+        }
+        return resultHead;
     }
 }
