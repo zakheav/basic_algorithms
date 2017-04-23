@@ -1,0 +1,142 @@
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashSet;
+import java.util.List;
+import java.util.PriorityQueue;
+import java.util.Scanner;
+import java.util.Set;
+import java.util.Stack;
+
+class Point {
+	public int r;
+	public int c;
+	public Point parent;// 记录路径中的父节点
+	public boolean wall;// 是否是墙
+	int F;// 估值函数的值
+	int pathLength;// 已扩展的路径长度
+
+	public Point(int wall, int r, int c) {
+		this.wall = wall == 1;
+		this.r = r;
+		this.c = c;
+	}
+
+	public boolean equal(Point p) {
+		return r == p.r && c == p.c;
+	}
+
+	public int get_score() {// 获取节点的评分
+		return F + pathLength;
+	}
+}
+
+class AstarComparater implements Comparator<Point> {
+
+	@Override
+	public int compare(Point p0, Point p1) {
+		return p0.F + p0.pathLength - p1.F - p1.pathLength;
+	}
+
+}
+
+class Astar {// 只能上下左右运动的Astar算法
+	private List<Point> get_nearPoint(Point now, Point[][] map) {
+		List<Point> nearPointList = new ArrayList<Point>();
+		if (map[now.r - 1][now.c] != null && !map[now.r - 1][now.c].wall) {// 上
+			nearPointList.add(map[now.r - 1][now.c]);
+		}
+		if (map[now.r + 1][now.c] != null && !map[now.r + 1][now.c].wall) {// 下
+			nearPointList.add(map[now.r + 1][now.c]);
+		}
+		if (map[now.r][now.c - 1] != null && !map[now.r][now.c - 1].wall) {// 左
+			nearPointList.add(map[now.r][now.c - 1]);
+		}
+		if (map[now.r][now.c + 1] != null && !map[now.r][now.c + 1].wall) {// 右
+			nearPointList.add(map[now.r][now.c + 1]);
+		}
+		return nearPointList;
+	}
+
+	private void set_F_pathLength_parent(Point end, Point now, Point parent) {
+		now.F = Math.abs(end.r - now.r) + Math.abs(end.c - now.c);
+		now.parent = parent;
+		now.pathLength = (parent == null ? 0 : parent.pathLength) + 1;
+
+	}
+
+	public void AstarRouter(Point[][] map, Point begin, Point end) {
+		PriorityQueue<Point> open = new PriorityQueue<Point>(11, new AstarComparater());// open表，存放待扩展结点
+		Set<Point> close = new HashSet<Point>();
+		set_F_pathLength_parent(end, begin, null);
+		open.offer(begin);
+		while (!open.isEmpty()) {
+			Point now = open.poll();
+			close.add(now);
+			if (now.equal(end)) {// 输出路径
+				Stack<Point> stack = new Stack<Point>();
+				while (now != null) {
+					stack.push(now);
+					now = now.parent;
+				}
+				while (!stack.isEmpty()) {
+					now = stack.pop();
+					System.out.println(now.r + " " + now.c);
+				}
+			} else {
+				List<Point> nearList = get_nearPoint(now, map);
+				// 计算扩展结点的目前评分
+				for (Point nearPoint : nearList) {
+					if (!open.contains(nearPoint) && !close.contains(nearPoint)) {// 没在open表和close表中
+						set_F_pathLength_parent(end, nearPoint, now);
+						open.add(nearPoint);
+					} else if (open.contains(nearPoint)) {// 在open表中
+						int oldScore = nearPoint.get_score();
+						int newScore = now.pathLength + 1 + Math.abs(end.r - nearPoint.r)
+								+ Math.abs(end.c - nearPoint.c);
+						if (oldScore > newScore) {// 更新nearPoint中的pathLength和F，替换open表中的原来的节点
+							open.remove(nearPoint);
+							set_F_pathLength_parent(end, nearPoint, now);
+							open.offer(nearPoint);
+						}
+					} else if (close.contains(nearPoint)) {// 在close表中
+						int oldScore = nearPoint.get_score();
+						int newScore = now.pathLength + 1 + Math.abs(end.r - nearPoint.r)
+								+ Math.abs(end.c - nearPoint.c);
+						if (oldScore > newScore) {// 更新nearPoint中的pathLength和F，把close表中的该节点放入open表中
+							close.remove(nearPoint);
+							set_F_pathLength_parent(end, nearPoint, now);
+							open.offer(nearPoint);
+						}
+					}
+				}
+			}
+		}
+	}
+}
+
+public class Main {
+
+	public static void main(String[] args) {
+		Scanner scanner = new Scanner(System.in);
+		int R = scanner.nextInt();
+		int C = scanner.nextInt();
+		Point[][] map = new Point[R + 2][C + 2];
+		for (int i = 1; i <= R; ++i) {
+			for (int j = 1; j <= C; ++j) {
+				int wall = scanner.nextInt();// 1是墙
+				map[i][j] = new Point(wall, i, j);
+			}
+		}
+
+		/*输入：
+		  	5 5
+			0 0 0 0 0
+			1 1 1 1 0
+			0 0 0 0 0
+			1 0 1 1 1
+			0 0 0 0 0
+		*/
+		new Astar().AstarRouter(map, map[1][1], map[R][C]);
+		scanner.close();
+	}
+}
