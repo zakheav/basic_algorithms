@@ -1,0 +1,38 @@
+九宫格解锁的所有可行情况数目
+可行情况要求，至少经过4个点，每两个点之间不会经过一个没有访问过的点
+public class Main {
+	private static int[][] filter = new int[10][10];// 记录两个点之间的分隔点
+	private static boolean[] visited = new boolean[10];// 记录1～9哪个点没有访问
+	private static int counter = 0;// 记录合法种类数
+	private static void init() {
+		filter[1][3] = filter[3][1] = 2;
+		filter[4][6] = filter[6][4] = 5;
+		filter[7][9] = filter[9][7] = 8;
+		filter[1][7] = filter[7][1] = 4;
+		filter[2][8] = filter[8][2] = 5;
+		filter[3][9] = filter[9][3] = 6;
+		filter[1][9] = filter[9][1] = 5;
+		filter[3][7] = filter[7][3] = 5;
+		visited[0] = true;// trick，假设相邻的点之间的"间隔点"是0
+	}
+
+	private static void dfs(List<Integer> path) {
+		if(path.size() >= 4) {
+			++counter;
+		}
+		for(int i = 1; i <= 9; ++i) {
+			if(path.size() == 0 || !visited[i] && visited[filter[i][path.get(path.size()-1)]]) {// 当前点没有访问过，并且没有越过没有经过的点
+				visited[i] = true;
+				path.add(i);
+				dfs(path);
+				path.remove(path.size() - 1);
+				visited[i] = false;
+			}
+		}
+	}
+	public static void main(String[] srgs) {
+		init();
+		dfs(new ArrayList<Integer>());
+		System.out.println(counter);
+	}
+}
