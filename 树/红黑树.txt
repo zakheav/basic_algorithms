@@ -18,13 +18,14 @@ class TreeNode {
 public class RedBlackTree {
 	public TreeNode root;// 父节点是nil
 	public TreeNode nil;// 叶子节点
+	public boolean flag = false;
 
 	public RedBlackTree() {
 		nil = new TreeNode();
 		nil.color = 1;// nil节点是黑色的
 		root = nil;
 	}
-	
+
 	// 层次输出结果
 	public void display() {
 		Queue<TreeNode> queue = new LinkedList<TreeNode>();
@@ -82,7 +83,7 @@ public class RedBlackTree {
 
 		y.p = x.p;
 		if (x.p == nil) {
-			y = root;
+			root = y;
 		} else if (x == x.p.left) {
 			x.p.left = y;
 		} else {
@@ -91,6 +92,7 @@ public class RedBlackTree {
 
 		y.right = x;
 		x.p = y;
+
 	}
 
 	// 插入操作
@@ -136,7 +138,6 @@ public class RedBlackTree {
 						z = z.p;
 						leftRotate(z);// 转化为情况3（维持性质5）
 					}
-
 					// 情况3
 					z.p.color = 1;
 					z.p.p.color = 0;// 修正性质4
