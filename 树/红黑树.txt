@@ -1,0 +1,178 @@
+import java.util.LinkedList;
+import java.util.Queue;
+// 红黑树的5条性质：
+// 1 每个节点是黑色或者红色
+// 2 根节点是黑色
+// 3 nil(叶节点)是黑色
+// 4 红色节点不能有红孩子
+// 5 每个节点到后代叶子节点的简单路径上，黑节点数目相同（4，5性质保证不会存在两颗子树高度差超过1倍）
+
+class TreeNode {
+	public int val;
+	public int color;// 0红1黑
+	public TreeNode p;// 父节点
+	public TreeNode left;
+	public TreeNode right;
+}
+
+public class RedBlackTree {
+	public TreeNode root;// 父节点是nil
+	public TreeNode nil;// 叶子节点
+
+	public RedBlackTree() {
+		nil = new TreeNode();
+		nil.color = 1;// nil节点是黑色的
+		root = nil;
+	}
+	
+	// 层次输出结果
+	public void display() {
+		Queue<TreeNode> queue = new LinkedList<TreeNode>();
+		Queue<Integer> depth = new LinkedList<Integer>();
+		int preDepth = 0;
+		queue.offer(root);
+		depth.offer(1);
+		while (!queue.isEmpty()) {
+			TreeNode now = queue.poll();
+			int nowDepth = depth.poll();
+			if (nowDepth > preDepth) {
+				System.out.println();
+				preDepth = nowDepth;
+			}
+			if (now == nil)
+				System.out.print("n_1 ");
+			else {
+				System.out.print(now.val + "_" + now.color + " ");
+				depth.add(preDepth + 1);
+				depth.add(preDepth + 1);
+				queue.add(now.left);
+				queue.add(now.right);
+			}
+		}
+	}
+
+	private void leftRotate(TreeNode x) {// 把node节点为根的子树左旋（不会改变查找树的性质）
+		TreeNode y = x.right;
+
+		x.right = y.left;// y节点的左子树放到x节点的右枝
+		if (y.left != nil) {
+			y.left.p = x;
+		}
+
+		y.p = x.p;// y接到x的父节点下面
+		if (x.p == nil) {// x原来是root
+			root = y;
+		} else if (x == x.p.left) {
+			x.p.left = y;
+		} else {
+			x.p.right = y;
+		}
+
+		y.left = x;// x接到y的左枝
+		x.p = y;
+	}
+
+	private void rightRotate(TreeNode x) {// 把node节点为根的子树右旋（不会改变查找树的性质）
+		TreeNode y = x.left;
+
+		x.left = y.right;
+		if (y.right != nil) {
+			y.right.p = x;
+		}
+
+		y.p = x.p;
+		if (x.p == nil) {
+			y = root;
+		} else if (x == x.p.left) {
+			x.p.left = y;
+		} else {
+			x.p.right = y;
+		}
+
+		y.right = x;
+		x.p = y;
+	}
+
+	// 插入操作
+	public void insert(int value) {
+		TreeNode y = nil;
+		TreeNode x = root;
+		while (x != nil) {
+			y = x;
+			if (value < x.val) {// 小于放左边
+				x = x.left;
+			} else {// 大于等于放右边
+				x = x.right;
+			}
+		}
+		TreeNode z = new TreeNode();
+		z.val = value;
+		z.color = 0;// 新插入节点是红色的（维持性质5）
+		z.p = y;
+		if (y == nil) {// 新插入的是root节点
+			root = z;
+		} else if (z.val < y.val) {
+			y.left = z;
+		} else {
+			y.right = z;
+		}
+		z.left = z.right = nil;
+		insertFix(z);// 修正红黑树（只可能违背性质2和4中的一条）
+	}
+
+	// 节点插入后调整红黑树
+	private void insertFix(TreeNode z) {
+		while (z.p.color == 0) {// 在循环内部z.p一定不是根节点，也不会是nil节点（根节点和nil都是黑色的）
+			if (z.p == z.p.p.left) {// 当前节点的父节点是左枝
+				TreeNode y = z.p.p.right;// 叔节点
+				if (y.color == 0) {// 情况1
+					y.color = 1;
+					z.p.color = 1;
+					z.p.p.color = 0;// 维持性质5
+					z = z.p.p;
+				} else {// 情况2，3
+					// 情况2
+					if (z == z.p.right) {
+						z = z.p;
+						leftRotate(z);// 转化为情况3（维持性质5）
+					}
+
+					// 情况3
+					z.p.color = 1;
+					z.p.p.color = 0;// 修正性质4
+					rightRotate(z.p.p);// 维持性质5
+				}
+			} else {// 当前节点的父节点是右枝
+				TreeNode y = z.p.p.left;
+				if (y.color == 0) {
+					y.color = 1;
+					z.p.color = 1;
+					z.p.p.color = 0;
+					z = z.p.p;
+				} else {
+					if (z == z.p.left) {
+						z = z.p;
+						rightRotate(z);
+					}
+					z.p.color = 1;
+					z.p.p.color = 0;
+					leftRotate(z.p.p);
+				}
+			}
+		}
+		root.color = 1;// 修正性质2
+	}
+
+	public static void main(String[] args) {
+		RedBlackTree rbt = new RedBlackTree();
+		rbt.insert(6);
+		rbt.insert(7);
+		rbt.insert(8);
+		rbt.insert(1);
+		rbt.insert(2);
+		rbt.insert(3);
+		rbt.insert(4);
+		rbt.insert(5);
+		rbt.display();
+	}
+}
