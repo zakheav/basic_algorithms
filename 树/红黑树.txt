@@ -95,6 +95,27 @@ public class RedBlackTree {
 
 	}
 
+	private TreeNode findMinNode(TreeNode x) {// 查找子树中的最小节点
+		TreeNode pre = null;
+		TreeNode now = x;
+		while (now != nil) {
+			pre = now;
+			now = now.left;
+		}
+		return pre;
+	}
+
+	private void transplant(TreeNode u, TreeNode v) {// 用v节点替换u节点
+		if (u.p == nil) {// u是根节点
+			root = v;
+		} else if (u == u.p.left) {
+			u.p.left = v;
+		} else if (u == u.p.right) {
+			u.p.right = v;
+		}
+		v.p = u.p;
+	}
+
 	// 插入操作
 	public void insert(int value) {
 		TreeNode y = nil;
