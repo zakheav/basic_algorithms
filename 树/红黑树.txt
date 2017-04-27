@@ -226,6 +226,7 @@ public class RedBlackTree {
 			transplant(z, y);// y替换z
 			y.left = z.left;
 			y.left.p = y;
+			
 			y.color = z.color;// 更新y的颜色
 		}
 		if (y_origin_color == 1) {// y的原来颜色是黑色，上面对y的操作会让y当前节点的所有祖先的两枝中含有y的那一枝少一个黑色节点
@@ -236,7 +237,7 @@ public class RedBlackTree {
 	}
 
 	public void deleteFix(TreeNode x) {
-
+		
 	}
 
 	public static void main(String[] args) {
