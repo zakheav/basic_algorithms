@@ -50,6 +50,22 @@ public class RedBlackTree {
 				queue.add(now.right);
 			}
 		}
+		System.out.println();
+	}
+
+	// 查询
+	public TreeNode query(int val) {
+		TreeNode now = root;
+		while (now != nil) {
+			if (now.val > val) {
+				now = now.left;
+			} else if (now.val < val) {
+				now = now.right;
+			} else {
+				return now;
+			}
+		}
+		return null;
 	}
 
 	private void leftRotate(TreeNode x) {// 把node节点为根的子树左旋（不会改变查找树的性质）
@@ -93,27 +109,6 @@ public class RedBlackTree {
 		y.right = x;
 		x.p = y;
 
-	}
-
-	private TreeNode findMinNode(TreeNode x) {// 查找子树中的最小节点
-		TreeNode pre = null;
-		TreeNode now = x;
-		while (now != nil) {
-			pre = now;
-			now = now.left;
-		}
-		return pre;
-	}
-
-	private void transplant(TreeNode u, TreeNode v) {// 用v节点替换u节点
-		if (u.p == nil) {// u是根节点
-			root = v;
-		} else if (u == u.p.left) {
-			u.p.left = v;
-		} else if (u == u.p.right) {
-			u.p.right = v;
-		}
-		v.p = u.p;
 	}
 
 	// 插入操作
@@ -185,6 +180,65 @@ public class RedBlackTree {
 		root.color = 1;// 修正性质2
 	}
 
+	private TreeNode findMinNode(TreeNode x) {// 查找子树中的最小节点
+		TreeNode pre = null;
+		TreeNode now = x;
+		while (now != nil) {
+			pre = now;
+			now = now.left;
+		}
+		return pre;
+	}
+
+	private void transplant(TreeNode u, TreeNode v) {// 用v节点替换u节点
+		if (u.p == nil) {// u是根节点
+			root = v;
+		} else if (u == u.p.left) {
+			u.p.left = v;
+		} else if (u == u.p.right) {
+			u.p.right = v;
+		}
+		v.p = u.p;
+	}
+
+	// 删除操作
+	public void delete(TreeNode z) {
+		TreeNode x = null;// x节点是用来替换y节点的
+		TreeNode y = z;// y节点是要删除的节点，或者是要用来替换z的节点
+		int y_origin_color = y.color;
+		if (z.left == nil) {// 没有左枝
+			x = z.right;
+			transplant(z, x);
+		} else if (z.right == nil) {// 没有右枝
+			x = z.left;
+			transplant(z, x);
+		} else {// 有左右两枝
+			y = findMinNode(z.right);// 让y指向z节点的后继
+			y_origin_color = y.color;
+			x = y.right;// y的左节点一定是nil
+			if (y.p == z) {
+				x.p = y;// 假如x是nil节点，做处理
+			} else {
+				transplant(y, x);// x替换y（*）
+				y.right = z.right;
+				y.right.p = y;
+			}
+			transplant(z, y);// y替换z
+			y.left = z.left;
+			y.left.p = y;
+			y.color = z.color;// 更新y的颜色
+		}
+		if (y_origin_color == 1) {// y的原来颜色是黑色，上面对y的操作会让y当前节点的所有祖先的两枝中含有y的那一枝少一个黑色节点
+			// 并且，x替换y那里（*标记），可能会导致x.p是红色，x也是红色
+			// 可能违反性质2，4，5
+			deleteFix(x);
+		}
+	}
+
+	public void deleteFix(TreeNode x) {
+
+	}
+
 	public static void main(String[] args) {
 		RedBlackTree rbt = new RedBlackTree();
 		rbt.insert(6);
@@ -195,6 +249,10 @@ public class RedBlackTree {
 		rbt.insert(3);
 		rbt.insert(4);
 		rbt.insert(5);
+		rbt.display();
+
+		TreeNode tn = rbt.query(8);
+		rbt.delete(tn);
 		rbt.display();
 	}
 }
