@@ -226,18 +226,47 @@ public class RedBlackTree {
 			transplant(z, y);// y替换z
 			y.left = z.left;
 			y.left.p = y;
-			
+
 			y.color = z.color;// 更新y的颜色
 		}
 		if (y_origin_color == 1) {// y的原来颜色是黑色，上面对y的操作会让y当前节点的所有祖先的两枝中含有y的那一枝少一个黑色节点
-			// 并且，x替换y那里（*标记），可能会导致x.p是红色，x也是红色
+			// 并且，x替换y那里（*标记），可能会导致x.p是红色，x也是红色(唯一可能出现这种问题的地方)
 			// 可能违反性质2，4，5
 			deleteFix(x);
 		}
 	}
 
 	public void deleteFix(TreeNode x) {
-		
+		// x指向的节点会多算一次黑色（节点原来是红色，则x指向这个节点后节点记作“红黑”）
+		// 这样可以弥补delete函数中y节点操作带来的少一个黑色节点（传入的x节点就是之前y节点的位置）
+		while (x != root && x.color == 1) {// 循环内x指向节点一定是“黑黑”
+			if (x == x.p.left) {
+				TreeNode w = x.p.right;// w一直是x的兄弟节点，且一定不可能是nil（假如是nil会使x.p到x的路径上黑节点>x.p到w路径上黑节点）
+				if (w.color == 0) {// x.p一定是黑的
+					w.color = 1;
+					x.p.color = 0;
+					leftRotate(x.p);
+					w = x.p.right;
+				}
+				if (w.left.color == 1 && w.right.color == 0) {
+					w.color = 0;
+					x = x.p;
+				} else if (w.right.color == 1) {
+					w.left.color = 1;
+					w.color = 0;
+					rightRotate(w);
+					w = x.p.right;
+				}
+				w.color = x.p.color;
+				x.p.color = 1;
+				w.right.color = 1;
+				leftRotate(x.p);
+				x = root;
+			} else {
+
+			}
+		}
+		x.color = 1;
 	}
 
 	public static void main(String[] args) {
