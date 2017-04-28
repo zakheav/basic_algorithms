@@ -1,4 +1,6 @@
+import java.util.ArrayList;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Queue;
 // 红黑树的5条性质：
 // 1 每个节点是黑色或者红色
@@ -30,26 +32,47 @@ public class RedBlackTree {
 	public void display() {
 		Queue<TreeNode> queue = new LinkedList<TreeNode>();
 		Queue<Integer> depth = new LinkedList<Integer>();
+		List<List<String>> result = new ArrayList<List<String>>();
 		int preDepth = 0;
 		queue.offer(root);
 		depth.offer(1);
+		int idx = -1;
+		int width = 0;
 		while (!queue.isEmpty()) {
 			TreeNode now = queue.poll();
 			int nowDepth = depth.poll();
 			if (nowDepth > preDepth) {
-				System.out.println();
+				result.add(new ArrayList<String>());
+				++idx;
 				preDepth = nowDepth;
 			}
 			if (now == nil)
-				System.out.print("n_1 ");
+				result.get(idx).add("n_1");
 			else {
-				System.out.print(now.val + "_" + now.color + " ");
+				result.get(idx).add(now.val + "_" + now.color);
 				depth.add(preDepth + 1);
 				depth.add(preDepth + 1);
 				queue.add(now.left);
 				queue.add(now.right);
 			}
+			width = Math.max(width, result.get(idx).size());
 		}
+		for (int i = 0; i < result.size(); ++i) {
+			int spaceNum = (width - result.get(i).size()) / result.get(i).size();
+			
+			for (int j = 0; j < result.get(i).size(); ++j) {
+				for (int k = 0; k <= spaceNum / 2; ++k) {
+					System.out.print(" ");
+				}
+				System.out.print(result.get(i).get(j));
+				for (int k = 0; k <= spaceNum / 2; ++k) {
+					System.out.print(" ");
+				}
+			}
+			System.out.println();
+			System.out.println();
+		}
+		System.out.println();
 		System.out.println();
 	}
 
@@ -249,21 +272,25 @@ public class RedBlackTree {
 					leftRotate(x.p);
 					w = x.p.right;
 				}
-				if (w.left.color == 1 && w.right.color == 1) {// 情况2（这里把x向上推）
+				if (w.left.color == 1 && w.right.color == 1) {// 情况2(只有情况2,x才向上不断走)
 					w.color = 0;
 					x = x.p;
-				} else if (w.right.color == 1) {// 情况3
-					w.left.color = 1;
-					w.color = 0;
-					rightRotate(w);
-					w = x.p.right;
+				} else {
+					// 情况3
+					if (w.right.color == 1) {
+						w.left.color = 1;
+						w.color = 0;
+						rightRotate(w);
+						w = x.p.right;
+					}
+					// 情况4
+					w.color = x.p.color;
+					x.p.color = 1;
+					w.right.color = 1;
+					leftRotate(x.p);
+					x = root;
 				}
-				// 情况4(通过这里的变换可以让x上的多余黑色去掉)
-				w.color = x.p.color;
-				x.p.color = 1;
-				w.right.color = 1;
-				leftRotate(x.p);
-				x = root;
+
 			} else {
 				TreeNode w = x.p.left;
 				if (w.color == 0) {
@@ -275,17 +302,19 @@ public class RedBlackTree {
 				if (w.left.color == 1 && w.right.color == 1) {
 					w.color = 0;
 					x = x.p;
-				} else if (w.left.color == 1) {
-					w.right.color = 1;
-					w.color = 0;
-					leftRotate(w);
-					w = x.p.left;
+				} else {
+					if (w.left.color == 1) {
+						w.right.color = 1;
+						w.color = 0;
+						leftRotate(w);
+						w = x.p.left;
+					}
+					w.color = x.p.color;
+					x.p.color = 1;
+					w.left.color = 1;
+					rightRotate(x.p);
+					x = root;
 				}
-				w.color = x.p.color;
-				x.p.color = 1;
-				w.left.color = 1;
-				rightRotate(x.p);
-				x = root;
 			}
 		}
 		x.color = 1;
@@ -300,6 +329,7 @@ public class RedBlackTree {
 		rbt.insert(2);
 		rbt.insert(3);
 		rbt.insert(4);
+		rbt.insert(5);
 		rbt.insert(5);
 		rbt.display();
 
