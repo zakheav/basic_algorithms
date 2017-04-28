@@ -242,28 +242,50 @@ public class RedBlackTree {
 		while (x != root && x.color == 1) {// 循环内x指向节点一定是“黑黑”
 			if (x == x.p.left) {
 				TreeNode w = x.p.right;// w一直是x的兄弟节点，且一定不可能是nil（假如是nil会使x.p到x的路径上黑节点>x.p到w路径上黑节点）
+				// 情况1
 				if (w.color == 0) {// x.p一定是黑的
 					w.color = 1;
-					x.p.color = 0;
+					w.p.color = 0;
 					leftRotate(x.p);
 					w = x.p.right;
 				}
-				if (w.left.color == 1 && w.right.color == 0) {
+				if (w.left.color == 1 && w.right.color == 1) {// 情况2
 					w.color = 0;
 					x = x.p;
-				} else if (w.right.color == 1) {
+				} else if (w.right.color == 1) {// 情况3
 					w.left.color = 1;
 					w.color = 0;
 					rightRotate(w);
 					w = x.p.right;
 				}
+				// 情况4
 				w.color = x.p.color;
 				x.p.color = 1;
 				w.right.color = 1;
 				leftRotate(x.p);
 				x = root;
 			} else {
-
+				TreeNode w = x.p.left;
+				if (w.color == 0) {
+					w.color = 1;
+					w.p.color = 0;
+					rightRotate(x.p);
+					w = x.p.right;
+				}
+				if (w.left.color == 1 && w.right.color == 1) {
+					w.color = 0;
+					x = x.p;
+				} else if (w.left.color == 1) {
+					w.right.color = 1;
+					w.color = 0;
+					leftRotate(w);
+					w = x.p.left;
+				}
+				w.color = x.p.color;
+				x.p.color = 1;
+				w.left.color = 1;
+				rightRotate(x.p);
+				x = root;
 			}
 		}
 		x.color = 1;
@@ -281,7 +303,7 @@ public class RedBlackTree {
 		rbt.insert(5);
 		rbt.display();
 
-		TreeNode tn = rbt.query(8);
+		TreeNode tn = rbt.query(4);
 		rbt.delete(tn);
 		rbt.display();
 	}
