@@ -249,7 +249,7 @@ public class RedBlackTree {
 					leftRotate(x.p);
 					w = x.p.right;
 				}
-				if (w.left.color == 1 && w.right.color == 1) {// 情况2
+				if (w.left.color == 1 && w.right.color == 1) {// 情况2（这里把x向上推）
 					w.color = 0;
 					x = x.p;
 				} else if (w.right.color == 1) {// 情况3
@@ -258,7 +258,7 @@ public class RedBlackTree {
 					rightRotate(w);
 					w = x.p.right;
 				}
-				// 情况4
+				// 情况4(通过这里的变换可以让x上的多余黑色去掉)
 				w.color = x.p.color;
 				x.p.color = 1;
 				w.right.color = 1;
