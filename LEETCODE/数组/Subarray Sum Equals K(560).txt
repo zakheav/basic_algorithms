@@ -1,0 +1,35 @@
+Given an array of integers and an integer k, you need to find the total number of continuous subarrays whose sum equals to k.
+
+public class Solution {
+    public int subarraySum(int[] nums, int k) {
+        // sum_pos用途：在从左向右遍历nums的时候，假如遍历到nums[i]，sum_pos存储当前已经访问过的sums[]元素值sum以及累积和等于e的下标列表
+        Map<Integer, List<Integer>> sum_pos = new HashMap<Integer, List<Integer>>();
+        
+        // 累积和
+        int[] sums = new int[nums.length];
+        sums[0] = nums[0];
+        for(int i = 1; i < nums.length; ++i) {
+            sums[i] = sums[i - 1] + nums[i];
+        }
+        
+        // 初始化sum_pos
+        List<Integer> posList = new ArrayList<Integer>();// 目前累积和为sum的位置列表
+        posList.add(-1);
+        sum_pos.put(0, posList);
+        
+        int result = 0;
+        for(int i = 0; i < nums.length; ++i) {// 从左向右遍历nums[]数组
+            int sum = sums[i] - k;
+            int temp = sum_pos.get(sum) == null ? 0 : sum_pos.get(sum).size();
+            result += temp;
+            
+            if(sum_pos.get(sums[i]) == null) {
+                sum_pos.put(sums[i], new ArrayList<Integer>());
+            }
+            posList = sum_pos.get(sums[i]);
+            posList.add(i);
+            sum_pos.put(sums[i], posList);
+        }
+        return result;
+    }
+}
