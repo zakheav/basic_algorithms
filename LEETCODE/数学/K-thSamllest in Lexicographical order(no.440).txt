@@ -1,0 +1,48 @@
+
+Example:
+Input:
+n: 13   k: 2
+
+Output:
+10
+
+Explanation:
+The lexicographical order is [1, 10, 11, 12, 13, 2, 3, 4, 5, 6, 7, 8, 9], so the second smallest number is 10.
+
+// 把数字的排布看作是10叉树，根节点是0，第一层是{1，2，3...9}，第二层是{10，11...19}；{20，21...29}....
+// 字典序就是对上面的这个树进行前序遍历
+public class Solution {
+    // 计算某一层相邻两个节点p1，p2之间前序遍历相隔多少步
+    // 计算方式采用逐层计算的方式，从上向下计算
+    private int findStep(int n, long p1, long p2) {
+        long n1 = p1, n2 = p2;// n1的最右边的兄弟和n2相邻
+        long step = 0;
+        while(n1 <= n) {
+            step += Math.min(n, n2 - 1) - n1 + 1;
+            n1 *= 10;
+            n2 *= 10;
+        }
+        return (int)step;
+    }
+    
+    // 从树的顶层开始，计算相邻两个节点先序遍历间隔的step
+    // 1 如果k == 0，return当前节点
+    // 2 如果step <= k，那么k = k - step，横向切换下一个节点
+    // 3 否则, 那么节点切换为下一层的节点，重复上面过程
+    public int findKthNumber(int n, int k) {
+        long now = 1;
+        --k;
+        while(k > 0) {
+            long next = now + 1;
+            int step = findStep(n, now, now + 1);
+            if(step <= k) {
+                k -= step;
+                now += 1;
+            } else {
+                --k;
+                now *= 10;
+            }
+        }
+        return (int)now;
+    }
+}
