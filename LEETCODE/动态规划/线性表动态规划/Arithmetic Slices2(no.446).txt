@@ -1,0 +1,60 @@
+import java.util.HashMap;
+import java.util.Map;
+
+/**
+ * Created by yuanwei on 2017/5/29.
+ */
+public class Solution {
+    public int numberOfArithmeticSlices_slow(int[] A) {
+        // 记录以某个元素结尾的候选等差数列数目,每个元素是一个map,key是公差,value是这个公差的候选等差数列数目
+        Map<Long, Integer>[] candidateNum = new Map[A.length];
+        // 记录以某个元素结尾的等差数列数目,每个元素是一个map,key是公差,value是这个公差的等差数列数目
+        Map<Long, Integer>[] realNum = new Map[A.length];
+        for (int i = 0; i < A.length; ++i) {
+            candidateNum[i] = new HashMap<>();
+            realNum[i] = new HashMap<>();
+        }// 初始化
+        int result = 0;
+        for (int i = 1; i < A.length; ++i) {
+            for (int j = i - 1; j >= 0; --j) {
+                long dif = (long) A[i] - (long) A[j];
+                // 更新i下标元素的realNum
+                int newValue = realNum[i].getOrDefault(dif, 0);
+                newValue += realNum[j].getOrDefault(dif, 0);
+                newValue += candidateNum[j].getOrDefault(dif, 0);
+                realNum[i].put(dif, newValue);
+
+                // 更新i下标元素的candidateNum
+                newValue = candidateNum[i].getOrDefault(dif, 0) + 1;
+                candidateNum[i].put(dif, newValue);
+            }
+            for (long key : realNum[i].keySet()) {
+                result += realNum[i].get(key);
+            }
+        }
+        return result;
+    }
+
+    // 上面算法的优化版本,去掉了candidateNum列表
+    public int numberOfArithmeticSlices(int[] A) {
+        // 记录以某个元素结尾的等差数列数目,每个元素是一个map,key是公差,value是这个公差的等差数列数目
+        Map<Long, Integer>[] realNum = new Map[A.length];
+        for (int i = 0; i < A.length; ++i) {
+            realNum[i] = new HashMap<>();
+        }// 初始化
+        int result = 0;
+        for (int i = 1; i < A.length; ++i) {
+            for (int j = i - 1; j >= 0; --j) {
+                long dif = (long) A[i] - (long) A[j];
+                // 更新i下标元素的realNum
+                int c1 = realNum[i].getOrDefault(dif, 0);
+                int c2 = realNum[j].getOrDefault(dif, 0);
+                realNum[i].put(dif, c1 + c2 + 1);
+
+                result += c2;// 这里只加c2, 就已经去除了长度为2的数列了,所以不需要candidateNum列表
+            }
+
+        }
+        return result;
+    }
+}
