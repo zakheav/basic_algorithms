@@ -1,0 +1,88 @@
+class Element {
+    int value;// 数字的值
+    int tag;// 当前数字出现的数组
+
+    public String toString() {
+        return value + " " + tag;
+    }
+
+    public Element(int v, int t) {
+        value = v;
+        tag = t;
+    }
+}
+
+class MinComparator implements Comparator<Element> {
+    public int compare(Element o1, Element o2) {
+        return o1.value - o2.value;
+    }
+}
+
+public class Solution {
+    public int[] smallestRange(List<List<Integer>> nums) {
+        List<Element> mergeList = new ArrayList<Element>();
+        PriorityQueue<Element> minHeap = new PriorityQueue<Element>(new MinComparator());
+        for (int i = 0; i < nums.size(); ++i) {// 初始化小根堆
+            minHeap.offer(new Element(nums.get(i).get(0), i));
+        }
+        int[] idxArr = new int[nums.size()];
+        while (!minHeap.isEmpty()) {// 把多个数组进行merge
+            Element cur = minHeap.poll();
+            mergeList.add(cur);
+            ++idxArr[cur.tag];
+            if (idxArr[cur.tag] < nums.get(cur.tag).size()) {
+                minHeap.offer(new Element(nums.get(cur.tag).get(idxArr[cur.tag]), cur.tag));
+            }
+        }
+        for (Element e : mergeList) {
+            System.out.println(e);
+        }
+        int left = 0, right = 0;// 双指针, 区间是[left, right)
+        int[] counters = new int[nums.size()];
+        int cnt = 0;
+        int status = 0;
+        int[] result = new int[2];
+        int range = Integer.MAX_VALUE;
+        while(left < mergeList.size() || right < mergeList.size()) {
+            if(status == 0 && right < mergeList.size()) {
+                int leftV = mergeList.get(left).value;
+                int rightV = mergeList.get(right).value;
+                int tag = mergeList.get(right).tag;
+                cnt = counters[tag] == 0 ? cnt + 1 : cnt;
+                ++counters[tag];
+                if(cnt >= nums.size()) {// 收齐了
+                    System.out.println(leftV + ", " + rightV);
+                    if(rightV - leftV + 1 < range) {
+                        range = rightV - leftV + 1;
+                        result[0] = leftV;
+                        result[1] = rightV;
+                    }
+                    status = 1;
+                }
+                ++right;
+            } else {
+                int tag = mergeList.get(left).tag;
+                cnt = counters[tag] == 1 ? cnt - 1 : cnt;
+                --counters[tag];
+                ++left;
+                if(cnt >= nums.size()) {// 依然是收齐状态
+                    int leftV = mergeList.get(left).value;
+                    int rightV = mergeList.get(right - 1).value;
+
+                    System.out.println(leftV + ", " + rightV);
+                    if(rightV - leftV + 1 < range) {
+                        range = rightV - leftV + 1;
+                        result[0] = leftV;
+                        result[1] = rightV;
+                    }
+                } else {
+                    status = 0;
+                }
+
+            }
+        }
+
+        return result;
+    }
+
+}
