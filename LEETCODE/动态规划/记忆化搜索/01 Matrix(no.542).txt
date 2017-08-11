@@ -1,0 +1,59 @@
+Given a matrix consists of 0 and 1, find the distance of the nearest 0 for each cell.
+
+The distance between two adjacent cells is 1.
+Example 1: 
+Input:
+
+0 0 0
+0 1 0
+0 0 0
+Output:
+0 0 0
+0 1 0
+0 0 0
+Example 2: 
+Input:
+
+0 0 0
+0 1 0
+1 1 1
+Output:
+0 0 0
+0 1 0
+1 2 1
+
+
+public class Solution {
+	// 思路：从0元素开始广度优先搜索
+	// 每个节点到0元素的距离的候选值 = 其父节点到0元素的距离+1
+	// 每个节点到0元素的距离的最终值 = min{候选值}
+	public int[][] updateMatrix(int[][] matrix) {
+		int[][] result = new int[matrix.length][matrix[0].length];
+		Queue<int[]> queue = new LinkedList<int[]>();// BFS的队列，记录坐标
+		// 初始化result数组，0元素距离0的距离是0，1元素距离0的距离是正无穷
+		for(int i = 0; i < matrix.length; ++i) {
+			for(int j = 0; j < matrix[0].length; ++j) {
+				result[i][j] = matrix[i][j] == 0 ? 0 : Integer.MAX_VALUE;
+				if(matrix[i][j] == 0) {
+					queue.offer(new int[]{i, j});// 向队列中加入根节点
+				}
+			}
+		}
+		int[][] dirs = {{-1, 0}, {1, 0}, {0, -1}, {0, 1}};// 方向数组
+		
+		while(!queue.isEmpty()) {
+			int[] now = queue.poll();
+			for(int[] d : dirs) {// 遍历四个方向
+				int r = now[0] + d[0];
+				int c = now[1] + d[1];// 子节点的坐标
+				if(r >= 0 && r < matrix.length && c >= 0 && c < matrix[0].length) {
+					if(result[r][c] > result[now[0]][now[1]] + 1) {// 子节点到0的候选距离比当前计算的候选距离大
+						result[r][c] = result[now[0]][now[1]] + 1;// 更新候选距离
+						queue.offer(new int[]{r, c});// 该节点周围的节点的候选距离也会相应改变，所以加入队列
+					}
+				}
+			}
+		}
+		return result;
+	}
+}
