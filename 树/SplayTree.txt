@@ -1,0 +1,147 @@
+package test;
+
+class SplayTreeNode {
+	public int val;
+	public SplayTreeNode left;// 左孩子
+	public SplayTreeNode right;// 右孩子
+
+	public SplayTreeNode(int key) {
+		val = key;
+		left = null;
+		right = null;
+	}
+}
+
+public class SplayTree {
+	public SplayTreeNode root;
+
+	private SplayTreeNode leftRotate(SplayTreeNode x) {// 左旋
+		SplayTreeNode y = x.right;
+		x.right = y.left;
+		y.left = x;
+		return y;
+	}
+
+	private SplayTreeNode rightRotate(SplayTreeNode x) {// 右旋
+		SplayTreeNode y = x.left;
+		x.left = y.right;
+		y.right = x;
+		return y;
+	}
+
+	private SplayTreeNode splay(SplayTreeNode root, int key) {// 查找key，并伸展树；当key在树中时key将成为树根，否则最后访问的节点成为树根
+		if (root == null || root.val == key) {
+			return root;
+		} else if (root.val > key) {// 可能在左子树
+			if (root.left == null) {// 没查找到
+				return root;
+			}
+			// key不在左子树根部的两种情况，需要把key转化到左子树的根部
+			if (root.left.val > key) {// 这一步导致root.left == null
+				root.left.left = splay(root.left.left, key);// 把key旋转到左子树的左子树根部
+				root = rightRotate(root);
+			} else if (root.left.val < key) {
+				root.left.right = splay(root.left.right, key);// 把key旋转到左子树的右子树根部
+				if (root.left.right != null) {
+					root.left = leftRotate(root.left);
+				}
+			}
+			// 右旋
+			return root.left == null ? root : rightRotate(root);
+		} else {// 可能在右子树
+			if (root.right == null) {// 没查找到
+				return root;
+			}
+			// key不在右子树根部的两种情况，需要把key转化为右子树根部
+			if (root.right.val > key) {
+				root.right.left = splay(root.right.left, key);// 把key旋转到右子树的左子树根部
+				if (root.right.left != null) {
+					root.right = rightRotate(root.right);
+				}
+			} else if (root.right.val < key) {// 这一步导致root.right == null
+				root.right.right = splay(root.right.right, key);// 把key旋转到右子树的右子树根部
+				root = leftRotate(root);
+			}
+			// 左旋
+			return root.right == null ? root : leftRotate(root);
+		}
+	}
+
+	public SplayTreeNode search(int key) {// 返回splayTree的新的root，如果key在树中，则新的root.val就等于key
+		return root = splay(root, key);
+	}
+
+	public void insert(int key) {// 插入新节点
+		if (root == null) {
+			root = new SplayTreeNode(key);
+		}
+		root = splay(root, key);// 把最接近key的节点调整为根节点
+		if (root.val == key) {// key已经存在
+			// do nothing
+		} else {// key不存在
+			SplayTreeNode newNode = new SplayTreeNode(key);
+			if (key < root.val) {
+				newNode.right = root;
+				newNode.left = root.left;
+				root.left = null;
+				root = newNode;
+			} else {
+				newNode.left = root;
+				newNode.right = root.right;
+				root.right = null;
+				root = newNode;
+			}
+		}
+	}
+	
+	public void delete(int key) {
+		if (root == null) {
+			// do nothing
+		} else {
+			// 把要删除的节点splay到根节点
+			root = splay (root, key);
+			if (root.val != key) {// key不在树中
+				// do nothing
+			} else {
+				SplayTreeNode root1 = root.left;// 左子树
+				SplayTreeNode root2 = root.right;// 右子树
+				if (root1 == null) {
+					root = root2;
+				} else {
+					// splay root1中的最大的节点
+					root = splay (root1, key);// 由于key不存在于左子树，所以相当于splay左子树最大的节点
+					// 左子树最大节点肯定没有右枝，所以把root2接在其右枝
+					root.right = root2;
+				}
+			}
+		}
+	}
+	
+	public void preOrder (SplayTreeNode root) {
+		if (root != null) {
+			System.out.println(root.val);
+			preOrder (root.left);
+			preOrder (root.right);
+		}
+	}
+	
+	public static void main (String[] args) {
+		SplayTree st = new SplayTree ();
+//		st.root = new SplayTreeNode (100);
+//		st.root.left = new SplayTreeNode (50);
+//		st.root.right = new SplayTreeNode (200);
+//		st.root.left.left = new SplayTreeNode (40);
+//		st.root.left.left.left = new SplayTreeNode (30);
+//		st.root.left.left.left.left = new SplayTreeNode (20);
+//		st.search(20);
+//		st.insert(25);
+		st.root = new SplayTreeNode (6);
+		st.root.left = new SplayTreeNode (1);
+		st.root.right = new SplayTreeNode (9);
+		st.root.left.right = new SplayTreeNode (4);
+		st.root.left.right.left = new SplayTreeNode (2);
+		st.root.right.left = new SplayTreeNode (7);
+		st.delete(4);
+		st.preOrder(st.root);
+	}
+}
