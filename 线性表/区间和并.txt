@@ -1,4 +1,4 @@
-class PairComparator implements Comparator<Integer[]> {// 按照区间的起始排序
+class PairComparator implements Comparator<Integer[]> {
 	@Override
 	public int compare(Integer[] p1, Integer[] p2) {
 		return p1[0] - p2[0];
