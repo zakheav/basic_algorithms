@@ -1,0 +1,85 @@
+class TreeNode {
+  public int key;
+  public TreeNode left = null;
+  public TreeNode right = null;
+  public int lflag = 0;
+  public int rflag = 0;
+
+  public TreeNode(int key) {
+    this.key = key;
+  }
+}
+
+public class ThreadedBinaryTree {
+
+  /*
+  线索化root为根的二叉树
+  输入：树根root
+  */
+  public void createInThread(TreeNode root) {
+    TreeNode lastNode = inThread(null, root);
+    lastNode.right = null;
+    lastNode.rflag = 1;
+  }
+
+  /*
+  返回当前节点的下一个节点
+  */
+  public TreeNode next(TreeNode p) {
+    if (p.rflag == 0) {
+      return first(p.right);
+    }
+    return p.right;
+  }
+
+  /*
+  中序遍历线索二叉树
+  */
+  public void inOrder(TreeNode root) {
+    for (TreeNode p = first(root); p != null; p = next(p)) {
+      // visit(p)
+    }
+  }
+
+  /*
+  线索化以p节点为根的子树
+  输入：当前节点p
+       当前节点的前驱pre
+  返回：线索化之后的最后一个节点
+  */
+  private TreeNode inThread(TreeNode pre, TreeNode p) {
+    if (p != null) {
+      // 线索化左子树
+      pre = inThread(pre, p.left);
+      if (p.left == null) {
+        p.left = pre;
+        p.lflag = 1;
+      }
+      // 修改pre节点的后继信息
+      /*
+      pre只可能是
+      1. p左子树中的节点
+      2. p的父节点，并且p是其右孩子
+      */
+      if (pre != null && pre.right == null) {
+        pre.right = p;
+        pre.rflag = 1;
+      }
+      // 线索化右子树
+      pre = inThread(p, p.right);
+    }
+    return pre;
+  }
+
+  /*
+  寻找以p为根的子树的中序遍历第一个节点
+  */
+  private TreeNode first(TreeNode p) {
+    if (p == null) return null;
+    while (p.lflag == 0) {
+      p = p.left;
+    }
+    return p;
+  }
+}
+
