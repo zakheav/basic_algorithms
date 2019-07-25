@@ -35,20 +35,6 @@ public class SegmentTree {
     }
   }
 
-  private void pushUp(int nodeId, int newVal) {// 把当前线段树节点的更新向上更新到根节点
-    if (nodeId != 1) {// 没有到根节点
-      int parent_id = nodeId / 2;
-      int left_brother = parent_id * 2;
-      int right_brother = parent_id * 2 + 1;
-      if (nodeId % 2 == 0) {// nodeId是左孩子
-        segmentTree[parent_id].val = segmentTree[right_brother].val + newVal;
-      } else {
-        segmentTree[parent_id].val = segmentTree[left_brother].val + newVal;
-      }
-      pushUp(parent_id, segmentTree[parent_id].val);
-    }
-  }
-
   private void pushDown(int nodeId) {// 把线段树节点到更新向下推一层
     if (segmentTree[nodeId].begin < segmentTree[nodeId].end) {// 不是叶子结点
       int element_val = segmentTree[nodeId].val / (segmentTree[nodeId].end - segmentTree[nodeId].begin + 1);
@@ -58,24 +44,6 @@ public class SegmentTree {
       segmentTree[nodeId * 2 + 1].lazy = true;
     }
     segmentTree[nodeId].lazy = false;
-  }
-
-  public void update(int root, int u_begin, int u_end, int num) {// 把数组中[u_begin,u_end]区间的数字都更新为num
-    if (segmentTree[root].lazy) {// 需要把当前节点的值向下更新
-      pushDown(root);
-    }
-    if (segmentTree[root].begin == u_begin && segmentTree[root].end == u_end) {// 完美嵌入当前节点
-      segmentTree[root].val = num * (u_end - u_begin + 1);
-      segmentTree[root].lazy = true;
-      pushUp(root, segmentTree[root].val);
-    } else if (u_begin > segmentTree[root].mid) {// 完全在右枝
-      update(root * 2 + 1, u_begin, u_end, num);
-    } else if (u_end <= segmentTree[root].mid) {// 完全在左枝
-      update(root * 2, u_begin, u_end, num);
-    } else {// 横跨左右枝
-      update(root * 2, u_begin, segmentTree[root].mid, num);
-      update(root * 2 + 1, segmentTree[root].mid + 1, u_end, num);
-    }
   }
 
   public int query(int root, int q_begin, int q_end) {// 查询指定区间中到元素和
@@ -93,15 +61,32 @@ public class SegmentTree {
     }
   }
 
+  public void update(int root, int u_begin, int u_end, int add_num) {
+    if (segmentTree[root].lazy) {// 需要把当前节点的值向下更新
+      pushDown(root);
+    }
+    segmentTree[root].val += add_num * (u_end - u_begin + 1);
+    if (segmentTree[root].begin == u_begin && segmentTree[root].end == u_end) {// 完美嵌入当前节点
+      segmentTree[root].lazy = true;
+    } else if (u_begin > segmentTree[root].mid) {// 完全在右枝
+      update(root * 2 + 1, u_begin, u_end, add_num);
+    } else if (u_end <= segmentTree[root].mid) {// 完全在左枝
+      update(root * 2, u_begin, u_end, add_num);
+    } else {// 横跨左右枝
+      update(root * 2, u_begin, segmentTree[root].mid, add_num);
+      update(root * 2 + 1, segmentTree[root].mid + 1, u_end, add_num);
+    }
+  }
+
   public static void main(String[] args) {
     int[] nums = {0,1,2,3,4,5,6,7,8,9,10,11,12,13,14,15};
     SegmentTree st = new SegmentTree(nums);
     st.update(1, 0, 4, 2);
-    System.out.println(st.query(1, 0, 3));// 8
+    System.out.println(st.query(1, 0, 3));// 14
     System.out.println(st.query(1, 7, 9));// 24
     System.out.println(st.query(1, 7, 7));// 7
     st.update(1, 4, 4, 100);
-    System.out.println(st.query(1, 0, 9));// 143
+    System.out.println(st.query(1, 0, 9));// 155
   }
 }
 
