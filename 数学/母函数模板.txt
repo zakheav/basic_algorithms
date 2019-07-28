@@ -1,0 +1,50 @@
+// 一共有k种物品，每件物品都有自己的价值，求达到总价值p有多少种选物品的方法
+/* 采用母函数的解法，建立母函数：
+( 1 + x^(v[0]*n1[0]) + x^(v[0]*(n1[0]+1)) + ... + x^(v[0]*n2[0]) ) *
+( 1 + x^(v[1]*n1[1]) + x^(v[1]*(n1[1]+1)) + ... + x^(v[1]*n2[1]) ) *
+...
+( 1 + x^(v[k]*n1[k]) + x^(v[k]*(n1[k]+1)) + ... + x^(v[k]*n2[k]) )
+
+其中 v 存放每个物品的价值，n1 存储每个物品最少携带次数，n2 存储每个物品最多携带次数，k 存储物品的种类
+那么母函数展开之后，幂为p的项的系数即为所求
+*/
+
+public class GeneratingFunction {
+  private int[] v;  // 存储每个物品的价值
+  private int[] n1;  // 存储每个物品最少携带次数
+  private int[] n2;  // 存储每个物品最多携带次数
+  private int k;  // 存储物品的种类
+  private int MAX_NUM = 10;
+
+  public GeneratingFunction(int[] v, int[] n1, int[] n2) {
+    this.v = v;
+    this.n1 = n1;
+    this.n2 = n2;
+    k = v.length;
+  }
+
+  public int Comput(int p) {  // 计算达到p总价值有多少种获取方法，就是展开母函数
+    int[] acc = new int[MAX_NUM];  // 存储已经展开的部分母函数，acc[i]存储幂为i的项的系数
+    acc[0] = 1;
+    for (int i = 0; i < k; ++i) {  // 每种物品（母函数种每一个因子）
+      // 每个因子的每一项和acc中的每一项相乘
+      int[] tmp = new int[MAX_NUM];
+      for (int j = n1[i]; j <= n2[i] && j * v[i] <= p; ++j) {  // 每种物品取j个（每个因子的每一项）
+        for (int k = 0; k + j * v[i] <= p; ++k) {  // acc中的每一项acc[k]
+          tmp[k + j * v[i]] += acc[k];
+        }
+      }
+      for (int j = 0; j < MAX_NUM; ++j) acc[j] = tmp[j];
+    }
+    return acc[p];
+  }
+
+  public static void main(String[] args) {
+    int[] v = {1, 2, 3};
+    int[] n1 = {0, 0, 0};
+    int[] n2 = {1, 1, 1};
+    GeneratingFunction g = new GeneratingFunction(v, n1, n2);
+    System.out.println(g.Comput(6));
+  }
+}
+
