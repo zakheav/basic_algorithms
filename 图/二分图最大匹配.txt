@@ -1,0 +1,52 @@
+/* boys find girls */
+class Hungary {
+  private int boysNum, girlsNum;
+  private boolean[][] graph;
+  private boolean[] matched;  // 存储每次递归尝试匹配某个boy的时候，哪些girl已经被匹配
+  public int[] myBoys;  // 存储匹配情况
+
+  public Hungary(boolean[][] graph) {
+    boysNum = graph.length;
+    girlsNum = graph[0].length;
+    this.graph = graph;
+    myBoys = new int[girlsNum];
+    for (int i = 0; i < girlsNum; ++i) myBoys[i] = -1;
+    matched = null;
+  }
+
+  private boolean DFS(int boyId) {
+    for (int i = 0; i < girlsNum; ++i) {
+      if (graph[boyId][i] && !matched[i]) {
+        matched[i] = true;
+        if (myBoys[i] == -1 || DFS(myBoys[i])) {  // 调用DFS说明找到了潜在的增广路径
+          myBoys[i] = boyId;
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  int MaxMatch() {
+    int matchNum = 0;
+    for (int i = 0; i < boysNum; ++i) {  // 尝试给每个boy找个girl
+      matched = new boolean[girlsNum];  // 每次尝试都重新初始化
+      if (DFS(i)) ++matchNum;
+    }
+    return matchNum;
+  }
+
+  public static void main(String[] args) {
+    boolean[][] graph = {
+            {true, true, false, false},
+            {true, false, true, false},
+            {false, true, false, true},
+            {false, true, true, false}
+    };
+    Hungary h = new Hungary(graph);
+    System.out.println(h.MaxMatch());
+    for (int b : h.myBoys) {
+      System.out.println(b);
+    }
+  }
+
