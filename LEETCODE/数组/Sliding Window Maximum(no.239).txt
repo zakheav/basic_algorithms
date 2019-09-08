@@ -1,0 +1,45 @@
+class Solution {
+
+  private LinkedList<Integer> descList = new LinkedList<>();
+
+  private void DescListInit(int[] nums, int k) {
+    descList.offerFirst(nums[k - 1]);
+    for (int i = k - 2; i >= 0; --i) {
+      if (descList.getFirst() <= nums[i]) {
+        descList.offerFirst(nums[i]);
+      }
+    }
+  }
+
+  private void DescListUpdate(int out, int in) {
+    if (descList.getFirst() == out) {
+      descList.removeFirst();
+    }
+    while (!descList.isEmpty() && descList.getLast() < in) {
+      descList.removeLast();
+    }
+    descList.offerLast(in);
+  }
+
+  public int[] MaxSlidingWindow(int[] nums, int k) {
+    if (k > nums.length) k = nums.length;
+    if (k == 0) return new int[0];
+    int[] result = new int[nums.length - k + 1];
+    for (int i = 0; i <= nums.length - k; ++i) {
+      if (i == 0) {
+        DescListInit(nums, k);
+      }
+      result[i] = descList.getFirst();
+      if (i + k < nums.length) DescListUpdate(nums[i], nums[i + k]);
+    }
+    return result;
+  }
+
+  public static void main(String[] args) {
+    int[] nums = {1,3,-1,-3,5,3,6,7};
+    int[] result = new Solution().MaxSlidingWindow(nums, 3);
+    for (int n : result) {
+      System.out.println(n);
+    }
+  }
+}
