@@ -57,6 +57,8 @@ class SkipList {
 
   void Add(T v, float w);
 
+  void Delete(T v);
+
   void Print() const;
 
  private:
@@ -64,6 +66,8 @@ class SkipList {
   std::vector<Node<T>*> header_list_;
 
   std::vector<Node<T>*> GetTrace(T v) const;
+
+  std::vector<std::pair<Node<T>*, Node<T>*>> GetTraceWithPre(T v) const;
 
   bool Stop() const;
 };
@@ -109,6 +113,25 @@ void SkipList<T>::Add(T v, float w) {
     }
     if (i > 0) {
       result[i - 1]->weight_ += origin_w;
+    }
+  }
+}
+
+template<typename T>
+void SkipList<T>::Delete(T v) {
+  std::vector<std::pair<Node<T>*, Node<T>*>> result = GetTraceWithPre(v);
+  // find delete node
+  if (!result.back().second->null_ && result.back().second->value_ == v) {
+    float origin_w = result.back().second->weight_;
+    for (int32_t i = 0; i < result.size(); ++i) {
+      if (result[i].second->value_ == v) {
+        float new_weight = result[i].second->weight_ - origin_w;
+        result[i].first->weight_ += new_weight;
+        result[i].first->next_ = result[i].second->next_;
+        delete result[i].second;
+      } else {
+        result[i].second->weight_ -= origin_w;
+      }
     }
   }
 }
@@ -160,6 +183,46 @@ std::vector<Node<T>*> SkipList<T>::GetTrace(T v) const {
   return result;
 }
 
+template<typename T>
+std::vector<std::pair<Node<T>*, Node<T>*>>
+SkipList<T>::GetTraceWithPre(T v) const {
+  std::vector<std::pair<Node<T>*, Node<T>*>> result;
+  result.reserve(level_);
+
+  uint32_t l = level_ -1;
+  Node<T>* cur = header_list_[l];
+  Node<T>* pre = nullptr;
+  while (cur != nullptr && (cur->null_ || cur->value_ <= v)) {
+    if (l == 0) {
+      if (cur->null_ || cur->value_ < v) {
+        pre = cur;
+        cur = cur->next_;
+      } else if (cur->value_ == v) {
+        result.push_back(std::pair<Node<T>*, Node<T>*>(pre, cur));
+        break;
+      } else if (cur->value_ > v) {
+        result.push_back(std::pair<Node<T>*, Node<T>*>(pre, pre));
+      }
+    } else {
+      if (cur->next_ == nullptr || v < cur->next_->value_) {  // v < next
+        result.push_back(std::pair<Node<T>*, Node<T>*>(pre, cur));
+        pre = pre == nullptr ? nullptr : pre->down_;
+        cur = cur->down_;
+        while (pre != nullptr && pre->next_ != cur) {
+          pre = pre->next_;
+        }
+        --l;
+      } else {  // v >= next
+        pre = cur;
+        cur = cur->next_;
+      }
+    }
+  }
+  if (cur == nullptr) {
+    result.push_back(std::pair<Node<T>*, Node<T>*>(pre, pre));
+  }
+  return result;
+}
 
 template<typename T>
 bool SkipList<T>::Stop() const {

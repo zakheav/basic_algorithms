@@ -15,6 +15,14 @@ int main() {
   }
   skip_list.Print();
 
+  skip_list.Delete(1);
+  skip_list.Delete(3);
+  skip_list.Delete(5);
+  skip_list.Delete(7);
+  skip_list.Delete(9);
+  skip_list.Delete(11);
+
+  skip_list.Print();
   for (int32_t i = 0; i < 20; ++i) {
     try {
       const Node<int32_t>& n = skip_list.Get(i);
@@ -23,5 +31,6 @@ int main() {
       std::cout << msg << std::endl;
     }
   }
+
   return 0;
 }
