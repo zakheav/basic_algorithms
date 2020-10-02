@@ -87,9 +87,20 @@ void SkipList<T>::Add(T v, float w) {
   std::vector<Node<T>*> result = GetTrace(v);
   Node<T>* pre_insert = nullptr;
   bool stop = false;
+  // from l0 to ln
   for (int32_t i = result.size() - 1; i >= 0; --i) {
+    if (i < result.size() - 1) {
+      result[i]->weight_ += origin_w;
+    }
     if (!stop) {
-      if (i < result.size() - 1) {
+      if (i == result.size() - 1) {
+        Node<T>* pre = result[i];
+        Node<T>* cur = new Node<T>(v, origin_w);
+        cur->down_ = pre_insert;
+        cur->next_ = pre->next_;
+        pre->next_ = cur;
+        pre_insert = cur;
+      } else {
         // calculate sum weight
         Node<T>* end =
             result[i]->next_ == nullptr ?
@@ -99,21 +110,18 @@ void SkipList<T>::Add(T v, float w) {
         for (Node<T>* p = pre_insert; p != end; p = p->next_) {
           w += p->weight_;
         }
-      }
-      Node<T>* pre = result[i];
-      Node<T>* cur = new Node<T>(v, w);
-      cur->down_ = pre_insert;
-      cur->next_ = pre->next_;
-      pre->next_ = cur;
-      pre_insert = cur;
-      if (i < result.size() - 1) {
+        // insert
+        Node<T>* pre = result[i];
+        Node<T>* cur = new Node<T>(v, w);
+        cur->down_ = pre_insert;
+        cur->next_ = pre->next_;
+        pre->next_ = cur;
+        pre_insert = cur;
+
         result[i]->weight_ -= w;
       }
-      stop = stop || Stop();
     }
-    if (i > 0) {
-      result[i - 1]->weight_ += origin_w;
-    }
+    stop = stop || Stop();
   }
 }
 
@@ -123,8 +131,9 @@ void SkipList<T>::Delete(T v) {
   // find delete node
   if (!result.back().second->null_ && result.back().second->value_ == v) {
     float origin_w = result.back().second->weight_;
+    // from ln to l0
     for (int32_t i = 0; i < result.size(); ++i) {
-      if (result[i].second->value_ == v) {
+      if (!result[i].second->null_ && result[i].second->value_ == v) {
         float new_weight = result[i].second->weight_ - origin_w;
         result[i].first->weight_ += new_weight;
         result[i].first->next_ = result[i].second->next_;
@@ -188,7 +197,6 @@ std::vector<std::pair<Node<T>*, Node<T>*>>
 SkipList<T>::GetTraceWithPre(T v) const {
   std::vector<std::pair<Node<T>*, Node<T>*>> result;
   result.reserve(level_);
-
   uint32_t l = level_ -1;
   Node<T>* cur = header_list_[l];
   Node<T>* pre = nullptr;
